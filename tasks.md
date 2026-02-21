@@ -119,12 +119,13 @@
 
 ## 9. Shopping List Weekly Navigation
 
-- [ ] Link each `ShoppingList` to a specific week start date (similar to `MealPlan`)
-- [ ] Update the `/shopping-list` page to display the current week's list by default
-- [ ] Add previous and next week arrow buttons to navigate between weeks
-- [ ] Show the week date range (e.g. "Feb 16 - Feb 22") as a header like the planner
-- [ ] Auto-create a new shopping list for the current week if one doesn't exist
-- [ ] Preserve past shopping lists so users can look back at previous weeks
+- [X] Link each `ShoppingList` to a specific week start date (similar to `MealPlan`)
+- [X] Update the `/shopping-list` page to display the current week's list by default
+- [X] Add previous and next week arrow buttons to navigate between weeks
+- [X] Show the week date range (e.g. "Feb 16 - Feb 22") as a header like the planner
+- [X] Auto-create a new shopping list for the current week if one doesn't exist
+- [X] Preserve past shopping lists so users can look back at previous weeks
+- [ ] Give the user the ability to add an item to the shopping list that is not meal specific
 - [ ] Update the AI tools (`add-to-shopping-list`, `remove-from-shopping-list`) to always write to the current week's list
 
 ---

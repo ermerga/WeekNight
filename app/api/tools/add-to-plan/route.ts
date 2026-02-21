@@ -20,7 +20,6 @@ type AddToPlanInput = {
 }
 
 export async function POST(request: Request) {
-    console.log("backend is getting called.")
     const session = await auth()
     if (!session?.user?.id) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 })

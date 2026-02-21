@@ -51,8 +51,7 @@ const tools: Anthropic.Tool[] = [
             properties: {
                 day: {
                     type: "string",
-                    description: "The day of the week",
-                    enum: ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+                    description: "The day of the week (e.g. 'monday') OR a specific date (e.g. '2026-02-28'). Use a specific date when the user mentions an explicit date like 'February 28th'.",
                 },
                 meal_name: {
                     type: "string",
@@ -127,8 +126,7 @@ const tools: Anthropic.Tool[] = [
             properties: {
                 day: {
                     type: "string",
-                    description: "The day of the week",
-                    enum: ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+                    description: "The day of the week (e.g. 'monday') OR a specific date (e.g. '2026-02-28'). Use a specific date when the user mentions an explicit date like 'February 28th'.",
                 },
                 meal_name: {
                     type: "string",
@@ -149,19 +147,23 @@ const tools: Anthropic.Tool[] = [
 const systemPrompt = "You are a weekly meal planner assistant. You help users plan meals and manage their weekly meal schedule. When a user wants to add or remove a meal, use the appropriate tool with whatever description they provide - even if it's vague like 'the chicken dish' or 'something Italian'. The system uses fuzzy matching and semantic search to automatically find the best match. If no match is found, the tool will report that and you can ask for clarification then. Don't ask for exact meal names upfront - just try the tool first. If a user asks an unrelated question,respond that you can only help with meal planning."
 
 function getDateFromDay(day: string): string {
+    // Check if input is already a specific date (e.g. "2026-02-28")
+    if (/^\d{4}-\d{2}-\d{2}$/.test(day)) {
+        return day
+    }
+
+    // Otherwise treat it as a day name and find next occurrence
     const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"]
     const today = new Date()
     const todayIndex = today.getDay()
     const targetIndex = days.indexOf(day.toLowerCase())
 
-    // Calculate days until target (always go forward to next occurrence)                                                               
     let daysUntil = targetIndex - todayIndex
     if (daysUntil <= 0) daysUntil += 7
 
     const targetDate = new Date(today)
     targetDate.setDate(today.getDate() + daysUntil)
 
-    // Format in local time (not UTC)                                                                                                   
     const year = targetDate.getFullYear()
     const month = String(targetDate.getMonth() + 1).padStart(2, '0')
     const day_num = String(targetDate.getDate()).padStart(2, '0')
@@ -176,7 +178,7 @@ const MAX_CONTEXT_TOKENS = 2000;
 
 async function summarizeMessages(messages: Message[]): Promise<string> {
     const response = await anthropic.messages.create({
-        model: "claude-4-sonnet-20250514",
+        model: "claude-sonnet-4-6",
         max_tokens: 500,
         system: "Summarize this conversation concisely. Focus on key decisions, preferences, and any meals discussed. Keep it brief.",
         messages: [
@@ -280,7 +282,7 @@ export async function POST(request: Request) {
     })
 
     const response = await anthropic.messages.create({
-        model: "claude-4-sonnet-20250514",
+        model: "claude-sonnet-4-6",
         max_tokens: 1024,
         system: systemPrompt,
         messages: [
@@ -385,7 +387,7 @@ export async function POST(request: Request) {
 
         // Send ALL tool results back to Claude                                                                                         
         const followUpResponse = await anthropic.messages.create({
-            model: "claude-4-sonnet-20250514",
+            model: "claude-sonnet-4-6",
             max_tokens: 1024,
             system: systemPrompt,
             messages: [
