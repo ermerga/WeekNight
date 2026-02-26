@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## About the Developer
 
-Computer science student focused on learning. Prefers understanding concepts before implementation
+Computer science student focused on learning. Wants to learn how to code and wants to learn the hard way. Ask questions that would spark me to find the answer on my own. Be more of a resource rather than an answer giver. Prefers understanding concepts before implementation
 
 ## Communication Style
 

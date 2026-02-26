@@ -88,7 +88,6 @@ model FoodItem {
 
   inventoryItems    InventoryItem[]
   ingredients       Ingredient[]
-  shoppingListItems ShoppingListItem[]
 
   @@map("food_items")
 }
@@ -223,10 +222,10 @@ model ConversationSession {
 model ShoppingList {
   id         String   @id @default(cuid())
   userId     String
-  mealPlanId String?
   name       String?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+  weekStartDate DateTime
 
   user  User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   items ShoppingListItem[]
@@ -238,18 +237,16 @@ model ShoppingList {
 model ShoppingListItem {
   id             String   @id @default(cuid())
   shoppingListId String
-  foodItemId     String
-  quantity       Float
-  unit           String
+  name           String
+  quantity       Float?
+  unit           String?
   isPurchased    Boolean  @default(false)
   notes          String?
   createdAt      DateTime @default(now())
 
   shoppingList ShoppingList @relation(fields: [shoppingListId], references: [id], onDelete: Cascade)
-  foodItem     FoodItem     @relation(fields: [foodItemId], references: [id])
 
   @@index([shoppingListId])
-  @@index([foodItemId])
   @@map("shopping_list_items")
 }
 

@@ -39,6 +39,12 @@ type RemoveMealInput = {
     meal_name: string
     meal_type?: string
 }
+type ShoppingListAdd = {
+    name: string
+    quantity?: number
+    unit?: string
+    notes?: string
+}
 
 
 // Define the tools array once to avoid repetition                                                                                      
@@ -140,11 +146,37 @@ const tools: Anthropic.Tool[] = [
             },
             required: ["day", "meal_name"]
         }
+    }, 
+    {
+        name: "add-item-shopping-list",
+        description: "User is adding a seperate item that is not apart of a meal to the shopping list", 
+        input_schema: {
+            type: "object",
+            properties: {
+                name: {
+                    type: "string",
+                    description: "The name of the item that is getting added to the list"
+                }, 
+                quantity: {
+                    type: "number", 
+                    description: "The amount of the item that the user is wanting to add"
+                }, 
+                unit: {
+                    type: "string",
+                    description: "The unit of the item that they are wanting to add. Such as GALLONS of milk. Or Boxes of bags."
+                },
+                notes: {
+                    type: "string",
+                    description: "Any additional information the user may include that might be nice to store"
+                }
+            }, 
+            required: ["name"]
+        }
     }
 ]
 
 
-const systemPrompt = "You are a weekly meal planner assistant. You help users plan meals and manage their weekly meal schedule. When a user wants to add or remove a meal, use the appropriate tool with whatever description they provide - even if it's vague like 'the chicken dish' or 'something Italian'. The system uses fuzzy matching and semantic search to automatically find the best match. If no match is found, the tool will report that and you can ask for clarification then. Don't ask for exact meal names upfront - just try the tool first. If a user asks an unrelated question,respond that you can only help with meal planning."
+const systemPrompt = "You are a weekly meal planner assistant. You help users plan meals and manage their weekly meal schedule. When a user wants to add or remove a meal, use the appropriate tool with whatever description they provide - even if it's vague like 'the chicken dish' or 'something Italian'. The system uses fuzzy matching and semantic search to automatically find the best match. If no match is found, the tool will report that and you can ask for clarification then. Don't ask for exact meal names upfront - just try the tool first. If a user asks an unrelated question,respond that you can only help with meal planning. The user can also add items to the shopping list that are not associated to a specific meal."
 
 function getDateFromDay(day: string): string {
     // Check if input is already a specific date (e.g. "2026-02-28")
@@ -372,6 +404,32 @@ export async function POST(request: Request) {
                         mealName: meal_name,
                         date: targetDate,
                         mealType: meal_type  // Will be undefined if not provided                                                                 
+                    })
+                })
+
+                const result = await toolResponse.json()
+
+                toolResults.push({
+                    type: "tool_result",
+                    tool_use_id: toolUseBlock.id,
+                    content: JSON.stringify(result)
+                })
+            } else if (toolUseBlock.type === "tool_use" && toolUseBlock.name === "add-item-shopping-list") {
+                const { name, quantity, unit, notes } = toolUseBlock.input as ShoppingListAdd; 
+
+
+                const url = new URL('/api/tools/add-list', request.url)
+                const toolResponse = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Cookie': request.headers.get('cookie') || ''
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        quantity: quantity,
+                        unit: unit,
+                        notes: notes                                                               
                     })
                 })
 
