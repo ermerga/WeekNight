@@ -68,6 +68,23 @@ export default async function ShoppingListPage({
         },
     })
 
+    const miscItems = await prisma.shoppingList.findFirst({
+        where: {
+            userId: session.user?.id,
+            weekStartDate: weekStart
+        },
+        include: {
+            items: true
+        }
+    })
+
+    const miscShoppingItems = (miscItems?.items || []).map((item) => ({
+        name: item.name,
+        toBuy: item.quantity ?? null,
+        unit: item.unit ?? null,
+        inStock: undefined
+    }))
+
     // 2. Get user's current inventory
     const inventory = await prisma.inventoryItem.findMany({
         where: {
@@ -115,6 +132,8 @@ export default async function ShoppingListPage({
         }
     }).filter((item) => item.toBuy > 0)
 
+    const combinedList = [...shoppingList, ...miscShoppingItems]
+
     return (
         <main className="max-w-4xl mx-auto p-6">
             <div className="flex justify-between items-center mb-6">
@@ -145,7 +164,7 @@ export default async function ShoppingListPage({
             </div>
 
             <div className="bg-white rounded-lg shadow">
-                {!mealPlan ? (
+                {!mealPlan && combinedList.length === 0 ? (
                     <div className="p-8 text-center">
                         <p className="text-gray-500 mb-4">No meal plan for this week.</p>
                         <Link
@@ -155,7 +174,7 @@ export default async function ShoppingListPage({
                             Go to Planner →
                         </Link>
                     </div>
-                ) : shoppingList.length === 0 ? (
+                ) : combinedList.length === 0 ? (
                     <div className="p-8 text-center">
                         <div className="text-4xl mb-2">✓</div>
                         <p className="text-green-600 font-medium">You have everything you need!</p>
@@ -163,8 +182,8 @@ export default async function ShoppingListPage({
                     </div>
                 ) : (
                     <ul className="divide-y divide-gray-200">
-                        {shoppingList.map((item) => (
-                            <li key={item.foodItemId} className="p-4 flex justify-between items-center hover:bg-gray-50">
+                        {combinedList.map((item) => (
+                            <li key={item.name} className="p-4 flex justify-between items-center hover:bg-gray-50">
                                 <div className="flex items-center gap-3">
                                     <input
                                         type="checkbox"
@@ -177,7 +196,8 @@ export default async function ShoppingListPage({
                                         {item.toBuy} {item.unit}
                                     </span>
                                     <span className="block text-sm text-gray-400">
-                                        need {item.quantity}, have {item.inStock}
+                                        {item.inStock !== undefined && (`need ${item.quantity}, have ${item.inStock}`)}
+                                        
                                     </span>
                                 </div>
                             </li>
