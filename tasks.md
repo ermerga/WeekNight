@@ -31,11 +31,11 @@
 
 - [ ] Update the `ShoppingListItem` model to support custom categories (produce, dairy, snacks, household, toiletries, etc.)
 - [ ] Remove any UI that allows manual item addition - all list management goes through AI
-- [ ] Create an `add-to-shopping-list` tool so Claude can add any item (not just meal ingredients)
+- [X] Create an `add-to-shopping-list` tool so Claude can add any item (not just meal ingredients)
 - [ ] Create a `remove-from-shopping-list` tool so Claude can remove items
 - [ ] Create a `clear-shopping-list` tool for clearing completed or all items
 - [ ] Update the `/shopping-list` page to display items grouped by category
-- [ ] Add the ability to check off items as purchased (UI only)
+- [ ] Add the ability to check off items as purchased, then this will update the users inventory
 - [ ] Update the system prompt so Claude knows it can manage the full shopping list
 
 ---
@@ -53,14 +53,14 @@
 
 ## 5. Cooking Mode (Dinner UI)
 
-- [ ] Create a cooking mode page at `/meals/[id]/cook`
-- [ ] Page should display the meal name, description, prep time, and servings
-- [ ] Show a clear ingredients list with quantities and units
-- [ ] Show step-by-step cooking instructions
-- [ ] Show macro breakdown (calories, protein, carbs, fat)
-- [ ] Add a "Mark as Cooked" button that logs to `MealHistory`
-- [ ] Make the page mobile-friendly for use in the kitchen
-- [ ] Add a link to cooking mode from the planner when a meal is planned for today
+- [ ] Step 1: Add `instructions`, `calories`, `protein`, `carbs`, `fat` fields to `Meal` in `prisma/schema.prisma`
+- [ ] Step 2: Run `npx prisma db push && npx prisma generate` to sync DB and client
+- [ ] Step 3: Update `app/api/tools/create-meal/route.ts` — after saving the meal, make a second Claude API call to generate instructions + macros from the ingredients, then update the meal record
+- [ ] Step 4: Create `app/meals/[id]/cook/page.tsx` — server component showing meal name, description, prep time, servings, ingredients list, step-by-step instructions, and macro breakdown
+- [ ] Step 5: Create `app/api/mark-cooked/route.ts` — API route that accepts a meal ID and writes a record to `MealHistory`
+- [ ] Step 6: Add a small client component for the "Mark as Cooked" button that calls the above route
+- [ ] Step 7: Update `app/planner/page.tsx` — add a "Cook →" link on each planned meal card linking to `/meals/[id]/cook`
+- [ ] Make the cooking page mobile-friendly for use in the kitchen
 
 ---
 
@@ -127,7 +127,7 @@
 - [X] Preserve past shopping lists so users can look back at previous weeks
 - [X] Give the user the ability to add an item to the shopping list that is not meal specific
 - [X] Update the shopping list to query for the needed meal ingredients and the misc items that the user has added.
-- [ ] Update the AI tools (`add-to-shopping-list`, `remove-from-shopping-list`) to always write to the current week's list
+- [X] Update the AI tools (`add-to-shopping-list`, `remove-from-shopping-list`) to always write to the current week's list
 
 ---
 
