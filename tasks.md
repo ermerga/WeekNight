@@ -126,7 +126,7 @@
 - [X] Auto-create a new shopping list for the current week if one doesn't exist
 - [X] Preserve past shopping lists so users can look back at previous weeks
 - [X] Give the user the ability to add an item to the shopping list that is not meal specific
-- [ ] Update the shopping list to query for the needed meal ingredients and the misc items that the user has added.
+- [X] Update the shopping list to query for the needed meal ingredients and the misc items that the user has added.
 - [ ] Update the AI tools (`add-to-shopping-list`, `remove-from-shopping-list`) to always write to the current week's list
 
 ---
