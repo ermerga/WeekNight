@@ -57,12 +57,15 @@ The app uses two AI providers:
 - **Anthropic Claude** (`@anthropic-ai/sdk`) - For the chat assistant and tool orchestration in `/api/chat`
 - **OpenAI** (`openai`) - For generating text embeddings via `text-embedding-3-small` model
 
-The chat system implements Claude tool use with three tools:
+The chat system implements Claude tool use with four tools:
 - `add-meal-to-plan` - Adds a meal to a specific day
 - `create-meal` - Creates a new meal with ingredients
 - `remove-meal-from-plan` - Removes a meal from the plan
+- `add-item-shopping-list` - Adds a standalone item (not tied to a meal) to the shopping list
 
 Tool handlers are in `/app/api/chat/route.ts`. Each tool call triggers a fetch to the corresponding `/api/tools/*` endpoint.
+
+The chat route also manages context compression: when `conversationHistory` exceeds `MAX_CONTEXT_TOKENS` (2000), it summarizes the older half via a second Claude call and persists that summary in `UserContext`. On the next fresh session start, the saved summary is injected as the first assistant message.
 
 ### Meal Search
 
@@ -82,7 +85,21 @@ PostgreSQL with pgvector extension. Schema is in `prisma/schema.prisma`. Key mod
 
 ### Authentication
 
-Uses NextAuth v5 beta with Prisma adapter. Configuration in `lib/auth.ts`.
+Uses NextAuth v5 beta with Prisma adapter. Configuration in `lib/auth.ts`. Supports two providers:
+- **Google OAuth** — requires `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET`
+- **Credentials** — email + bcrypt-hashed password; uses JWT session strategy (required for Credentials provider)
+
+`session.user.id` is populated via a JWT callback and used throughout API routes for user-scoped queries.
+
+### Planner vs. Chat API
+
+There are two separate AI chat endpoints:
+- `/app/api/chat/route.ts` — general assistant with tool use (the main chat)
+- `/app/api/planner/chat/route.ts` — planner-specific chat (also has `/planner/confirm` and `/planner/meals`)
+
+### Hooks
+
+`/hooks/` currently only contains a `README.ts` placeholder. No custom React hooks have been implemented yet — data fetching is done inline in page components.
 
 ### Date Handling
 
@@ -97,6 +114,7 @@ Uses NextAuth v5 beta with Prisma adapter. Configuration in `lib/auth.ts`.
 - `/app/api/tools/*` - Individual tool implementations
 - `/lib/embeddings.ts` - OpenAI embedding generation
 - `/prisma/seed.ts` - Database seeding (uses relative import for embeddings)
+- `/app/api/planner/` - Separate planner-specific endpoints (chat, confirm, meals)
 
 ## Environment Variables
 
@@ -105,3 +123,21 @@ Required in `.env`:
 - `ANTHROPIC_API_KEY` - For Claude chat
 - `OPENAI_API_KEY` - For embeddings
 - Auth-related variables for NextAuth
+
+## Skill routing
+
+When the user's request matches an available skill, invoke it via the Skill tool. When in doubt, invoke the skill.
+
+Key routing rules:
+- Product ideas/brainstorming → invoke /office-hours
+- Strategy/scope → invoke /plan-ceo-review
+- Architecture → invoke /plan-eng-review
+- Design system/plan review → invoke /design-consultation or /plan-design-review
+- Full review pipeline → invoke /autoplan
+- Bugs/errors → invoke /investigate
+- QA/testing site behavior → invoke /qa or /qa-only
+- Code review/diff check → invoke /review
+- Visual polish → invoke /design-review
+- Ship/deploy/PR → invoke /ship or /land-and-deploy
+- Save progress → invoke /context-save
+- Resume context → invoke /context-restore
