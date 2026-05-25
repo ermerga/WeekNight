@@ -104,7 +104,7 @@ export default async function Home({
                                 </div>
 
                                 {dayMeals.length === 0 ? (
-                                    <p className="text-gray-300 text-xs italic">No meals</p>
+                                    <p className="text-gray-400 text-xs italic">No meals</p>
                                 ) : (
                                     <div className="space-y-1">
                                         {dayMeals.map((pm) => (
@@ -115,7 +115,7 @@ export default async function Home({
                                                 </div>
                                                 <Link
                                                     href={`/cook/${pm.id}`}
-                                                    className="flex-shrink-0 text-[10px] text-white bg-gray-900 rounded px-1.5 py-0.5 hover:bg-gray-700 mt-0.5"
+                                                    className="flex-shrink-0 text-[10px] text-white bg-gray-900 rounded px-2 py-1 hover:bg-gray-700 mt-0.5 min-h-[28px] flex items-center"
                                                 >
                                                     {pm.isCompleted ? "✓" : "Cook"}
                                                 </Link>
@@ -130,7 +130,7 @@ export default async function Home({
 
                 {/* Footer */}
                 <div className="flex-shrink-0 px-4 py-2.5 border-t border-gray-100 flex items-center justify-between bg-white">
-                    <span className="text-xs text-gray-500">{totalMeals} meals planned</span>
+                    <span className="text-xs text-gray-500">{totalMeals} {totalMeals === 1 ? "meal" : "meals"} planned</span>
                     <Link
                         href="/shopping-list"
                         className="text-xs bg-green-100 text-green-800 px-2.5 py-1 rounded-full hover:bg-green-200 transition-colors"
