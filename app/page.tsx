@@ -58,30 +58,33 @@ export default async function Home({
     const totalMeals = mealPlan?.plannedMeals.length ?? 0
 
     return (
-        // Mobile: column (chat on top, planner below). Desktop: row (planner left, chat right).
-        <div className="h-[calc(100vh-60px)] bg-gray-100 flex flex-col md:flex-row overflow-hidden">
+        <div className="h-[calc(100vh-60px)] bg-gray-100 flex flex-col md:flex-row overflow-hidden md:p-6 md:gap-4">
 
-            {/* Planner — bottom on mobile, left sidebar on desktop */}
-            <div className="order-2 md:order-1 h-72 md:h-auto md:w-96 flex-shrink-0 bg-white border-t md:border-t-0 md:border-r border-gray-200 flex flex-col overflow-hidden">
+            {/* Planner — bottom on mobile, left card on desktop */}
+            <div className="order-2 md:order-1 h-60 md:h-auto md:w-80 flex-shrink-0 bg-white border-t md:border-t-0 md:rounded-xl md:shadow-sm md:border border-gray-200 flex flex-col overflow-hidden">
 
-                {/* Header */}
-                <div className="px-4 py-3 border-b border-gray-100 flex-shrink-0">
-                    <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-gray-900">
-                            {session.user?.name?.split(" ")[0]}&apos;s week
-                        </span>
+                {/* Header — same structure as chat header */}
+                <div className="px-4 py-3 border-b border-gray-200 flex-shrink-0">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="font-semibold text-gray-900 text-sm">
+                                {session.user?.name?.split(" ")[0]}&apos;s week
+                            </p>
+                            <div className="flex items-center gap-2 mt-0.5">
+                                <Link href={`/?week=${formatDateForUrl(prevWeek)}`} className="text-xs text-gray-400 hover:text-gray-700 transition-colors">
+                                    ← Prev
+                                </Link>
+                                <span className="text-xs text-gray-400">·</span>
+                                <span className="text-xs text-gray-500">
+                                    {weekStart.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                                </span>
+                                <span className="text-xs text-gray-400">·</span>
+                                <Link href={`/?week=${formatDateForUrl(nextWeek)}`} className="text-xs text-gray-400 hover:text-gray-700 transition-colors">
+                                    Next →
+                                </Link>
+                            </div>
+                        </div>
                         <SignOutButton />
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                        <Link href={`/?week=${formatDateForUrl(prevWeek)}`} className="text-gray-500 hover:text-gray-900 px-1">
-                            ← Prev
-                        </Link>
-                        <span className="text-gray-700 font-medium text-xs">
-                            {weekStart.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                        </span>
-                        <Link href={`/?week=${formatDateForUrl(nextWeek)}`} className="text-gray-500 hover:text-gray-900 px-1">
-                            Next →
-                        </Link>
                     </div>
                 </div>
 
@@ -129,7 +132,7 @@ export default async function Home({
                 </div>
 
                 {/* Footer */}
-                <div className="flex-shrink-0 px-4 py-2.5 border-t border-gray-100 flex items-center justify-between bg-white">
+                <div className="flex-shrink-0 px-4 py-3 border-t border-gray-200 flex items-center justify-between">
                     <span className="text-xs text-gray-500">{totalMeals} {totalMeals === 1 ? "meal" : "meals"} planned</span>
                     <Link
                         href="/shopping-list"
@@ -140,18 +143,14 @@ export default async function Home({
                 </div>
             </div>
 
-            {/* Chat — top on mobile, main area on desktop */}
-            <div className="order-1 md:order-2 flex-1 flex flex-col overflow-hidden bg-gray-50 min-h-0">
-                <div className="flex-1 overflow-hidden min-h-0 flex flex-col">
-                    <div className="w-full max-w-2xl mx-auto flex flex-col flex-1 overflow-hidden min-h-0 bg-white md:my-6 md:rounded-xl md:shadow-sm md:border border-gray-200">
-                        <div className="flex-shrink-0 px-4 py-3 border-b border-gray-200">
-                            <h1 className="font-semibold text-gray-900 text-sm">Plan your week</h1>
-                            <p className="text-xs text-gray-500 mt-0.5">Ask me to add, remove, or suggest meals</p>
-                        </div>
-                        <div className="flex-1 overflow-hidden min-h-0">
-                            <ChatBox />
-                        </div>
-                    </div>
+            {/* Chat — top on mobile, right card on desktop */}
+            <div className="order-1 md:order-2 flex-1 bg-white border-b md:border-b-0 md:rounded-xl md:shadow-sm md:border border-gray-200 flex flex-col overflow-hidden min-h-0">
+                <div className="flex-shrink-0 px-4 py-3 border-b border-gray-200">
+                    <h1 className="font-semibold text-gray-900 text-sm">Plan your week</h1>
+                    <p className="text-xs text-gray-500 mt-0.5">Ask me to add, remove, or suggest meals</p>
+                </div>
+                <div className="flex-1 overflow-hidden min-h-0">
+                    <ChatBox />
                 </div>
             </div>
         </div>
