@@ -46,7 +46,7 @@ export default function RegisterPage() {
             }
 
             // Success - redirect to sign-in
-            router.push("/api/auth/signin?callbackUrl=/")
+            router.push("/signin")
         } catch (err) {
             setError("Something went wrong. Please try again.")
         } finally {
@@ -55,9 +55,9 @@ export default function RegisterPage() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="min-h-[calc(100vh-60px)] flex items-center justify-center bg-gray-100">
             <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
-                <h1 className="text-2xl font-bold text-center mb-6">Create Account</h1>
+                <h1 className="text-2xl font-bold text-center text-black mb-6">Create Account</h1>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     {/* Name field (optional) */}
@@ -70,7 +70,7 @@ export default function RegisterPage() {
                             type="text"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         />
                     </div>
 
@@ -85,7 +85,7 @@ export default function RegisterPage() {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         />
                     </div>
 
@@ -100,7 +100,7 @@ export default function RegisterPage() {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         />
                     </div>
 
@@ -115,7 +115,7 @@ export default function RegisterPage() {
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             required
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         />
                     </div>
 
@@ -139,7 +139,7 @@ export default function RegisterPage() {
                 {/* Link to sign-in */}
                 <p className="mt-6 text-center text-sm text-gray-600">
                     Already have an account?{" "}
-                    <Link href="/api/auth/signin" className="text-blue-600 hover:text-blue-700 font-medium">
+                    <Link href="/signin" className="text-blue-600 hover:text-blue-700 font-medium">
                         Sign in
                     </Link>
                 </p>

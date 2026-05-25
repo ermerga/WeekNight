@@ -3,16 +3,14 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
-export default function Nav() {
+export default function Nav({ isSignedIn }: { isSignedIn: boolean }) {
     const pathname = usePathname()
 
-    const links = [
+    const links = isSignedIn ? [
         { href: "/", label: "Home" },
-        { href: "/planner", label: "Planner" },
         { href: "/meals", label: "Meals" },
-        { href: "/inventory", label: "Inventory" },
         { href: "/shopping-list", label: "Shopping List" },
-    ]
+    ] : []
 
     return (
         <nav style={{
@@ -22,8 +20,8 @@ export default function Nav() {
             borderBottom: "1px solid #e5e5e5",
             backgroundColor: "#fff",
         }}>
-            <span style={{ fontWeight: "bold", marginRight: "auto" }}>
-                Meal Planner
+            <span style={{ fontWeight: "bold", marginRight: "auto", color: "#000" }}>
+                weeknight.ai
             </span>
 
             {links.map((link) => (

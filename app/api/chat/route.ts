@@ -27,6 +27,7 @@ type CreateMealInput = {
     servings?: number
     prepTime?: number
     cuisine?: string
+    steps?: string[]
     ingredients: {
         foodName: string
         quantity: number
@@ -97,6 +98,11 @@ const tools: Anthropic.Tool[] = [
                 cuisine: {
                     type: "string",
                     description: "Type of cuisine (e.g., Italian, Mexican, American)"
+                },
+                steps: {
+                    type: "array",
+                    description: "Step-by-step cooking instructions. Each step should be a clear, single action (e.g. 'Heat olive oil in a large pan over medium heat'). Include 4-10 steps.",
+                    items: { type: "string" }
                 },
                 ingredients: {
                     type: "array",
@@ -361,7 +367,7 @@ export async function POST(request: Request) {
                     content: JSON.stringify(result)
                 })
             } else if (toolUseBlock.type === "tool_use" && toolUseBlock.name === "create-meal") {
-                const { name, description, servings, prepTime, cuisine, ingredients } = toolUseBlock.input as CreateMealInput
+                const { name, description, servings, prepTime, cuisine, steps, ingredients } = toolUseBlock.input as CreateMealInput
 
                 const url = new URL('/api/tools/create-meal', request.url)
                 const toolResponse = await fetch(url, {
@@ -376,6 +382,7 @@ export async function POST(request: Request) {
                         servings,
                         prepTime,
                         cuisine,
+                        steps,
                         ingredients
                     })
                 })

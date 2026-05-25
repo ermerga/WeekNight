@@ -16,6 +16,7 @@ type CreateMealInput = {
     servings?: number
     prepTime?: number
     cuisine?: string
+    steps?: string[]
     ingredients: IngredientInput[]
 }
 
@@ -26,7 +27,7 @@ export async function POST(request: Request) {
     }
 
     const body: CreateMealInput = await request.json()
-    const { name, description, servings = 4, prepTime, cuisine, ingredients } = body
+    const { name, description, servings = 4, prepTime, cuisine, steps = [], ingredients } = body
 
     // Validate required fields                                                             
     if (!name || !ingredients?.length) {
@@ -78,6 +79,7 @@ export async function POST(request: Request) {
                 servings,
                 prepTime,
                 cuisine,
+                steps,
                 ingredients: {
                     create: processedIngredients,
                 },

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
+import { useRouter } from "next/navigation"
 
 type Message = {
     id: string
@@ -9,6 +10,7 @@ type Message = {
 }
 
 export default function ChatBox() {
+    const router = useRouter()
     const [messages, setMessages] = useState<Message[]>([])
     const [input, setInput] = useState("")
     const [isLoading, setIsLoading] = useState(false)
@@ -85,6 +87,7 @@ export default function ChatBox() {
                 content: data.response,
             }
             setMessages((prev) => [...prev, assistantMessage])
+            router.refresh()
         } catch (error) {
             console.error("Error:", error)
             const errorMessage: Message = {
@@ -101,7 +104,7 @@ export default function ChatBox() {
     }
 
     return (
-        <div className="flex flex-col h-[500px] w-full max-w-2xl bg-white rounded-lg shadow-lg overflow-hidden">
+        <div className="flex flex-col h-full w-full overflow-hidden">
             {/* Messages Area */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 {messages.map((message) => (

@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
+import ShoppingListItems from "@/components/shopping-list/ShoppingListItems"
 
 function getWeekStart(date: Date): Date {
     const d = new Date(date)
@@ -135,24 +136,24 @@ export default async function ShoppingListPage({
     const combinedList = [...shoppingList, ...miscShoppingItems]
 
     return (
-        <main className="max-w-4xl mx-auto p-6">
+        <main className="bg-gray-100 min-h-[calc(100vh-60px)]"><div className="max-w-4xl mx-auto p-6">
             <div className="flex justify-between items-center mb-6">
                 <div>
-                    <h1 className="text-3xl font-bold">Shopping List</h1>
+                    <h1 className="text-3xl font-bold text-gray-900">Shopping List</h1>
                     {/* Week navigation */}
                     <div className="flex items-center gap-4 mt-1">
                         <Link
                             href={`/shopping-list?week=${formatDateForUrl(prevWeek)}`}
-                            className="text-gray-500 hover:text-gray-900"
+                            className="text-gray-700 hover:text-gray-900"
                         >
                             ← Prev
                         </Link>
-                        <p className="text-gray-500">
+                        <p className="text-gray-900">
                             Week of {weekStart.toLocaleDateString("en-US", { month: "short", day: "numeric" })} - {weekEnd.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                         </p>
                         <Link
                             href={`/shopping-list?week=${formatDateForUrl(nextWeek)}`}
-                            className="text-gray-500 hover:text-gray-900"
+                            className="text-gray-700 hover:text-gray-900"
                         >
                             Next →
                         </Link>
@@ -166,7 +167,7 @@ export default async function ShoppingListPage({
             <div className="bg-white rounded-lg shadow">
                 {!mealPlan && combinedList.length === 0 ? (
                     <div className="p-8 text-center">
-                        <p className="text-gray-500 mb-4">No meal plan for this week.</p>
+                        <p className="text-gray-900 mb-4">No meal plan for this week.</p>
                         <Link
                             href="/planner"
                             className="text-blue-600 hover:text-blue-800 font-medium"
@@ -178,33 +179,15 @@ export default async function ShoppingListPage({
                     <div className="p-8 text-center">
                         <div className="text-4xl mb-2">✓</div>
                         <p className="text-green-600 font-medium">You have everything you need!</p>
-                        <p className="text-gray-500 text-sm">No items to buy this week.</p>
+                        <p className="text-gray-900 text-sm">No items to buy this week.</p>
                     </div>
                 ) : (
-                    <ul className="divide-y divide-gray-200">
-                        {combinedList.map((item) => (
-                            <li key={item.name} className="p-4 flex justify-between items-center hover:bg-gray-50">
-                                <div className="flex items-center gap-3">
-                                    <input
-                                        type="checkbox"
-                                        className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                    />
-                                    <span className="font-medium">{item.name}</span>
-                                </div>
-                                <div className="text-right">
-                                    <span className="font-semibold text-gray-900">
-                                        {item.toBuy} {item.unit}
-                                    </span>
-                                    <span className="block text-sm text-gray-400">
-                                        {item.inStock !== undefined && (`need ${item.quantity}, have ${item.inStock}`)}
-                                        
-                                    </span>
-                                </div>
-                            </li>
-                        ))}
-                    </ul>
+                    <ShoppingListItems
+                        items={combinedList}
+                        weekKey={formatDateForUrl(weekStart)}
+                    />
                 )}
             </div>
-        </main>
+        </div></main>
     )
 }

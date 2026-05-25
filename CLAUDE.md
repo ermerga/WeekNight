@@ -124,6 +124,11 @@ Required in `.env`:
 - `OPENAI_API_KEY` - For embeddings
 - Auth-related variables for NextAuth
 
+## Health Stack
+
+- typecheck: npx tsc --noEmit
+- lint: npx eslint .
+
 ## Skill routing
 
 When the user's request matches an available skill, invoke it via the Skill tool. When in doubt, invoke the skill.

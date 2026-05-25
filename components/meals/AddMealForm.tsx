@@ -18,6 +18,9 @@ type IngredientRow = {
     unit: string
 }
 
+const inputClass = "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+const labelClass = "block text-sm font-medium text-gray-900 mb-1"
+
 export default function AddMealForm({ foodItems }: Props) {
     const [name, setName] = useState("")
     const [description, setDescription] = useState("")
@@ -29,22 +32,16 @@ export default function AddMealForm({ foodItems }: Props) {
     ])
 
     const addIngredientRow = () => {
-        setIngredients([...ingredients, {
-            foodItemId: "", quantity: "", unit:
-                ""
-        }])
+        setIngredients([...ingredients, { foodItemId: "", quantity: "", unit: "" }])
     }
 
-    const updateIngredient = (index: number, field: keyof IngredientRow,
-        value: string) => {
+    const updateIngredient = (index: number, field: keyof IngredientRow, value: string) => {
         const updated = [...ingredients]
         updated[index][field] = value
-
         if (field === "foodItemId") {
             const food = foodItems.find(f => f.id === value)
             if (food) updated[index].unit = food.defaultUnit
         }
-
         setIngredients(updated)
     }
 
@@ -56,13 +53,8 @@ export default function AddMealForm({ foodItems }: Props) {
         e.preventDefault()
         const response = await fetch("/api/meals", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                name, description, servings, prepTime,
-                cuisine, ingredients
-            }),
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, description, servings, prepTime, cuisine, ingredients }),
         })
 
         if (response.ok) {
@@ -79,20 +71,14 @@ export default function AddMealForm({ foodItems }: Props) {
         }
     }
 
-    const inputClass = "w-full px-3 py-2 border border-gray-300 rounded-md shadow - sm focus: outline - none focus: ring - 2 focus: ring - blue - 500 focus: border - blue - 500"                                                       
-
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
             {/* Meal Details */}
             <div>
-                <h3 className="text-md font-medium text-gray-900 mb-3">Meal
-                    Details</h3>
+                <h3 className="text-md font-medium text-gray-900 mb-3">Meal Details</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="md:col-span-2">
-                        <label className="block text-sm font-medium          
-  text-gray-700 mb-1">
-                            Meal Name *
-                        </label>
+                        <label className={labelClass}>Meal Name *</label>
                         <input
                             type="text"
                             placeholder="e.g., Chicken Parmesan"
@@ -104,10 +90,7 @@ export default function AddMealForm({ foodItems }: Props) {
                     </div>
 
                     <div className="md:col-span-2">
-                        <label className="block text-sm font-medium          
-  text-gray-700 mb-1">
-                            Description
-                        </label>
+                        <label className={labelClass}>Description</label>
                         <textarea
                             placeholder="Brief description of the dish..."
                             value={description}
@@ -118,10 +101,7 @@ export default function AddMealForm({ foodItems }: Props) {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium          
-  text-gray-700 mb-1">
-                            Servings *
-                        </label>
+                        <label className={labelClass}>Servings *</label>
                         <input
                             type="number"
                             placeholder="4"
@@ -134,10 +114,7 @@ export default function AddMealForm({ foodItems }: Props) {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium          
-  text-gray-700 mb-1">
-                            Prep Time (mins)
-                        </label>
+                        <label className={labelClass}>Prep Time (mins)</label>
                         <input
                             type="number"
                             placeholder="30"
@@ -149,10 +126,7 @@ export default function AddMealForm({ foodItems }: Props) {
                     </div>
 
                     <div className="md:col-span-2">
-                        <label className="block text-sm font-medium          
-  text-gray-700 mb-1">
-                            Cuisine
-                        </label>
+                        <label className={labelClass}>Cuisine</label>
                         <input
                             type="text"
                             placeholder="e.g., Italian, Mexican, American"
@@ -166,24 +140,19 @@ export default function AddMealForm({ foodItems }: Props) {
 
             {/* Ingredients */}
             <div>
-                <h3 className="text-md font-medium text-gray-900             
-  mb-3">Ingredients</h3>
+                <h3 className="text-md font-medium text-gray-900 mb-3">Ingredients</h3>
                 <div className="space-y-3">
                     {ingredients.map((ingredient, index) => (
                         <div key={index} className="flex gap-2 items-start">
                             <select
                                 value={ingredient.foodItemId}
-                                onChange={(e) => updateIngredient(index,
-                                    "foodItemId", e.target.value)}
+                                onChange={(e) => updateIngredient(index, "foodItemId", e.target.value)}
                                 required
-                                className="flex-1 px-3 py-2 border           
-  border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2         
-  focus:ring-blue-500 focus:border-blue-500"
+                                className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             >
                                 <option value="">Select food...</option>
                                 {foodItems.map((food) => (
-                                    <option key={food.id}
-                                        value={food.id}>{food.name}</option>
+                                    <option key={food.id} value={food.id}>{food.name}</option>
                                 ))}
                             </select>
 
@@ -191,33 +160,26 @@ export default function AddMealForm({ foodItems }: Props) {
                                 type="number"
                                 placeholder="Qty"
                                 value={ingredient.quantity}
-                                onChange={(e) => updateIngredient(index,
-                                    "quantity", e.target.value)}
+                                onChange={(e) => updateIngredient(index, "quantity", e.target.value)}
                                 step="0.1"
                                 min="0"
                                 required
-                                className="w-20 px-3 py-2 border             
-  border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2         
-  focus:ring-blue-500 focus:border-blue-500"
+                                className="w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             />
 
                             <input
                                 type="text"
                                 placeholder="Unit"
                                 value={ingredient.unit}
-                                onChange={(e) => updateIngredient(index,
-                                    "unit", e.target.value)}
+                                onChange={(e) => updateIngredient(index, "unit", e.target.value)}
                                 required
-                                className="w-20 px-3 py-2 border             
-  border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2         
-  focus:ring-blue-500 focus:border-blue-500"
+                                className="w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             />
 
                             <button
                                 type="button"
                                 onClick={() => removeIngredientRow(index)}
-                                className="px-3 py-2 text-red-600            
-  hover:text-red-800 hover:bg-red-50 rounded-md transition-colors"
+                                className="px-3 py-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md transition-colors"
                             >
                                 ✕
                             </button>
@@ -228,8 +190,7 @@ export default function AddMealForm({ foodItems }: Props) {
                 <button
                     type="button"
                     onClick={addIngredientRow}
-                    className="mt-3 text-sm text-blue-600 hover:text-blue-800
-   font-medium"
+                    className="mt-3 text-sm text-blue-600 hover:text-blue-800 font-medium"
                 >
                     + Add Ingredient
                 </button>
@@ -238,9 +199,7 @@ export default function AddMealForm({ foodItems }: Props) {
             {/* Submit */}
             <button
                 type="submit"
-                className="w-full md:w-auto px-6 py-2 bg-blue-600 text-white 
-  font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2     
-  focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                className="w-full md:w-auto px-6 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
             >
                 Create Meal
             </button>
