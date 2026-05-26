@@ -109,7 +109,6 @@ export default function ChatBox() {
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 {messages.length === 0 && !isLoading && (
                     <div className="flex flex-col items-center justify-center h-full gap-3 text-center px-6">
-                        <div className="text-3xl">🍽️</div>
                         <p className="text-sm font-medium text-gray-700">What are you eating this week?</p>
                         <p className="text-xs text-gray-400 leading-relaxed">Try: "Add pasta for Tuesday dinner" or "Suggest a healthy breakfast"</p>
                     </div>
