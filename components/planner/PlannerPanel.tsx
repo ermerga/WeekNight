@@ -112,7 +112,7 @@ export default function PlannerPanel({
                                 className="rounded-lg px-2.5 py-2"
                                 style={{
                                     background: isToday ? "#F0F6F2" : "#fff",
-                                    borderLeft: `3px solid ${isToday ? "#1B5E40" : "#2D6A4F"}`,
+                                    border: isToday ? "1.5px solid #2D6A4F" : "1.5px solid #E8E5DF",
                                 }}
                             >
                                 <div className="flex items-center gap-1.5 mb-1.5">
@@ -231,7 +231,7 @@ export default function PlannerPanel({
                 {/* Active day card */}
                 <div
                     className="flex-1 mx-3 my-2 rounded-xl px-3 py-2 flex flex-col gap-1.5 overflow-hidden"
-                    style={{ background: "#F0F6F2", borderLeft: "3px solid #1B5E40" }}
+                    style={{ background: "#F0F6F2", border: "1.5px solid #2D6A4F" }}
                 >
                     {activeDayMeals.length === 0 ? (
                         <p className="text-xs italic" style={{ color: "#c4bdb5" }}>No meals — ask the chat!</p>
@@ -346,7 +346,7 @@ export default function PlannerPanel({
                                         className="rounded-lg px-2.5 py-2"
                                         style={{
                                             background: isToday ? "#F0F6F2" : "#fff",
-                                            borderLeft: `3px solid ${isToday ? "#1B5E40" : "#2D6A4F"}`,
+                                            border: isToday ? "1.5px solid #2D6A4F" : "1.5px solid #E8E5DF",
                                         }}
                                     >
                                         <div className="flex items-center gap-1.5 mb-1.5">
