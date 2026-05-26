@@ -84,7 +84,7 @@ export default function PlannerPanel({
                                 {userName}&apos;s week
                             </p>
                             <div className="flex items-center gap-2 mt-0.5">
-                                <Link href={prevWeekUrl} className="text-xs transition-opacity hover:opacity-60" style={{ color: "#a89f94" }}>
+                                <Link href={prevWeekUrl} className="text-xs transition-opacity hover:opacity-60 min-h-[44px] flex items-center px-1" style={{ color: "#a89f94" }}>
                                     ← Prev
                                 </Link>
                                 <span className="text-xs" style={{ color: "#a89f94" }}>·</span>
@@ -92,7 +92,7 @@ export default function PlannerPanel({
                                     {formatWeekStart(weekStartStr)}
                                 </span>
                                 <span className="text-xs" style={{ color: "#a89f94" }}>·</span>
-                                <Link href={nextWeekUrl} className="text-xs transition-opacity hover:opacity-60" style={{ color: "#a89f94" }}>
+                                <Link href={nextWeekUrl} className="text-xs transition-opacity hover:opacity-60 min-h-[44px] flex items-center px-1" style={{ color: "#a89f94" }}>
                                     Next →
                                 </Link>
                             </div>
