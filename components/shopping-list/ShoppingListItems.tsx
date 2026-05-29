@@ -54,7 +54,7 @@ export default function ShoppingListItems({ items, weekKey }: Props) {
                 return (
                     <li
                         key={item.name}
-                        className={`p-4 flex justify-between items-center hover:bg-gray-50 cursor-pointer ${isChecked ? "opacity-50" : ""}`}
+                        className={`px-4 min-h-[44px] flex justify-between items-center hover:bg-gray-50 cursor-pointer ${isChecked ? "opacity-50" : ""}`}
                         onClick={() => toggle(item.name)}
                     >
                         <div className="flex items-center gap-3">
