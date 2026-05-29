@@ -126,6 +126,9 @@ model Meal {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  /// pgvector embedding — stored via raw SQL, ignored by Prisma client
+  embedding   Unsupported("vector(1536)")?
+
   steps        String[]
 
   user         User?         @relation(fields: [userId], references: [id], onDelete: SetNull)

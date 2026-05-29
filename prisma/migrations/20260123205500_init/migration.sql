@@ -1,3 +1,6 @@
+-- Enable pgvector extension for semantic meal search
+CREATE EXTENSION IF NOT EXISTS vector;
+
 -- CreateTable
 CREATE TABLE "users" (
     "id" TEXT NOT NULL,
