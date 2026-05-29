@@ -106,7 +106,7 @@ export default function ChatBox() {
     }
 
     return (
-        <div className="flex flex-col h-full w-full overflow-hidden bg-white">
+        <div className="flex flex-col h-full w-full overflow-hidden bg-[#FAF9F6]">
             {/* Messages Area */}
             <div className="flex-1 overflow-y-auto px-4 py-5 space-y-3">
                 {messages.length === 0 && !isLoading && (
@@ -176,7 +176,7 @@ export default function ChatBox() {
             </div>
 
             {/* Input Area */}
-            <div className="border-t border-gray-100 px-4 py-3 bg-white">
+            <div className="border-t border-[#E8E5DF] px-4 py-3 bg-[#FAF9F6]">
                 <form onSubmit={handleSubmit} className="flex items-end gap-2">
                     <textarea
                         ref={textareaRef}

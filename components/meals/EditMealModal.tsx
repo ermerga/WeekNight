@@ -22,7 +22,7 @@ type Props = {
     onClose: () => void
 }
 
-const inputClass = "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+const inputClass = "w-full px-3 py-2 border border-[#E8E5DF] rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] focus:border-[#2D6A4F] bg-white"
 const labelClass = "block text-sm font-medium text-gray-900 mb-1"
 
 export default function EditMealModal({ meal, foodItems, onClose }: Props) {
@@ -92,7 +92,7 @@ export default function EditMealModal({ meal, foodItems, onClose }: Props) {
 
             {/* Modal */}
             <div className="relative bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
-                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-[#E8E5DF]">
                     <h2 className="text-lg font-semibold text-gray-900">Edit Meal</h2>
                     <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl leading-none">✕</button>
                 </div>
@@ -132,7 +132,7 @@ export default function EditMealModal({ meal, foodItems, onClose }: Props) {
                                         value={ing.foodItemId}
                                         onChange={(e) => updateIngredient(i, "foodItemId", e.target.value)}
                                         required
-                                        className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="flex-1 px-3 py-2 border border-[#E8E5DF] rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D6A4F]"
                                     >
                                         <option value="">Select food...</option>
                                         {foodItems.map((f) => <option key={f.id} value={f.id}>{f.name}</option>)}
@@ -141,13 +141,13 @@ export default function EditMealModal({ meal, foodItems, onClose }: Props) {
                                         type="number" placeholder="Qty" step="0.1" min="0" required
                                         value={ing.quantity}
                                         onChange={(e) => updateIngredient(i, "quantity", e.target.value)}
-                                        className="w-20 px-3 py-2 border border-gray-300 rounded-md text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-20 px-3 py-2 border border-[#E8E5DF] rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D6A4F]"
                                     />
                                     <input
                                         type="text" placeholder="Unit" required
                                         value={ing.unit}
                                         onChange={(e) => updateIngredient(i, "unit", e.target.value)}
-                                        className="w-20 px-3 py-2 border border-gray-300 rounded-md text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-20 px-3 py-2 border border-[#E8E5DF] rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D6A4F]"
                                     />
                                     <button
                                         type="button"
@@ -160,7 +160,7 @@ export default function EditMealModal({ meal, foodItems, onClose }: Props) {
                         <button
                             type="button"
                             onClick={() => setIngredients([...ingredients, { foodItemId: "", quantity: "", unit: "" }])}
-                            className="mt-2 text-sm text-blue-600 hover:text-blue-800 font-medium"
+                            className="mt-2 text-sm text-[#2D6A4F] hover:text-[#1B5E40] font-medium"
                         >+ Add Ingredient</button>
                     </div>
 
@@ -176,7 +176,7 @@ export default function EditMealModal({ meal, foodItems, onClose }: Props) {
                                         onChange={(e) => updateStep(i, e.target.value)}
                                         rows={2}
                                         placeholder={`Step ${i + 1}...`}
-                                        className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                                        className="flex-1 px-3 py-2 border border-[#E8E5DF] rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] resize-none"
                                     />
                                     <button
                                         type="button"
@@ -189,21 +189,21 @@ export default function EditMealModal({ meal, foodItems, onClose }: Props) {
                         <button
                             type="button"
                             onClick={() => setSteps([...steps, ""])}
-                            className="mt-2 text-sm text-blue-600 hover:text-blue-800 font-medium"
+                            className="mt-2 text-sm text-[#2D6A4F] hover:text-[#1B5E40] font-medium"
                         >+ Add Step</button>
                     </div>
 
                     {error && <p className="text-red-600 text-sm">{error}</p>}
                 </form>
 
-                <div className="flex justify-end gap-3 px-6 py-4 border-t border-gray-200">
+                <div className="flex justify-end gap-3 px-6 py-4 border-t border-[#E8E5DF]">
                     <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-gray-700 hover:text-gray-900">
                         Cancel
                     </button>
                     <button
                         onClick={handleSubmit as any}
                         disabled={saving}
-                        className="px-5 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                        className="px-5 py-2 bg-[#2D6A4F] text-white text-sm font-medium rounded-lg hover:bg-[#1B5E40] disabled:opacity-50 transition-colors"
                     >
                         {saving ? "Saving..." : "Save Changes"}
                     </button>

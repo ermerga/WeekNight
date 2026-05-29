@@ -48,7 +48,7 @@ export default function ShoppingListItems({ items, weekKey }: Props) {
     }
 
     return (
-        <ul className="divide-y divide-gray-200">
+        <ul className="divide-y divide-[#E8E5DF]">
             {items.map((item) => {
                 const isChecked = checked.has(item.name)
                 return (

@@ -13,7 +13,6 @@ export default function SignInPage() {
     const router = useRouter()
     const searchParams = useSearchParams()
 
-    // Get error from URL if NextAuth redirected with error
     const urlError = searchParams.get("error")
 
     const handleSubmit = async (e: FormEvent) => {
@@ -25,38 +24,44 @@ export default function SignInPage() {
             const result = await signIn("credentials", {
                 email,
                 password,
-                redirect: false, // Handle redirect manually
+                redirect: false,
             })
 
             if (result?.error) {
                 setError("Invalid email or password")
             } else {
-                // Success - redirect to home
                 router.push("/")
                 router.refresh()
             }
-        } catch (err) {
+        } catch {
             setError("Something went wrong. Please try again.")
         } finally {
             setIsLoading(false)
         }
     }
 
-    const handleGoogleSignIn = () => {
-        signIn("google", { callbackUrl: "/" })
-    }
+    const inputClass = "w-full px-4 py-2.5 border border-[#E8E5DF] rounded-lg text-gray-900 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] focus:border-[#2D6A4F]"
+    const labelClass = "block text-sm font-medium text-gray-700 mb-1"
 
     return (
-        <div className="min-h-[calc(100vh-60px)] flex items-center justify-center bg-gray-100">
-            <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
-                <h1 className="text-2xl font-bold text-center text-black mb-6">Sign In</h1>
+        <div className="min-h-[calc(100vh-60px)] flex items-center justify-center bg-[#FAF9F6] px-4">
+            <div className="w-full max-w-sm">
 
-                {/* Google Sign-In Button */}
+                {/* Logo mark */}
+                <div className="flex flex-col items-center mb-8">
+                    <div className="w-12 h-12 bg-[#2D6A4F] rounded-2xl flex items-center justify-center mb-3 shadow-sm">
+                        <span className="text-white text-xl font-bold">W</span>
+                    </div>
+                    <h1 className="text-xl font-bold text-gray-900">Welcome back</h1>
+                    <p className="text-sm text-gray-500 mt-1">Sign in to WeekNight</p>
+                </div>
+
+                {/* Google */}
                 <button
-                    onClick={handleGoogleSignIn}
-                    className="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] focus:ring-offset-2 mb-6"
+                    onClick={() => signIn("google", { callbackUrl: "/" })}
+                    className="w-full flex items-center justify-center gap-3 bg-white border border-[#E8E5DF] text-gray-700 py-2.5 px-4 rounded-lg text-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] focus:ring-offset-2 mb-5 transition-colors"
                 >
-                    <svg className="w-5 h-5" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4" viewBox="0 0 24 24">
                         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
                         <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
                         <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
@@ -65,48 +70,44 @@ export default function SignInPage() {
                     Continue with Google
                 </button>
 
-                <div className="relative mb-6">
+                <div className="relative mb-5">
                     <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-gray-300"></div>
+                        <div className="w-full border-t border-[#E8E5DF]" />
                     </div>
-                    <div className="relative flex justify-center text-sm">
-                        <span className="px-2 bg-white text-gray-500">Or continue with email</span>
+                    <div className="relative flex justify-center text-xs">
+                        <span className="px-2 bg-[#FAF9F6] text-gray-400">or continue with email</span>
                     </div>
                 </div>
 
-                {/* Email/Password Form */}
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                            Email
-                        </label>
+                        <label htmlFor="email" className={labelClass}>Email</label>
                         <input
                             id="email"
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-[#2D6A4F] focus:border-[#2D6A4F]"
+                            placeholder="you@example.com"
+                            className={inputClass}
                         />
                     </div>
 
                     <div>
-                        <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                            Password
-                        </label>
+                        <label htmlFor="password" className={labelClass}>Password</label>
                         <input
                             id="password"
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-[#2D6A4F] focus:border-[#2D6A4F]"
+                            placeholder="••••••••"
+                            className={inputClass}
                         />
                     </div>
 
-                    {/* Error message */}
                     {(error || urlError) && (
-                        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
                             {error || "Authentication failed"}
                         </div>
                     )}
@@ -114,19 +115,18 @@ export default function SignInPage() {
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full bg-[#2D6A4F] text-white py-2 px-4 rounded-lg hover:bg-[#1B5E40] focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full bg-[#2D6A4F] text-white py-2.5 px-4 rounded-lg text-sm font-medium hover:bg-[#1B5E40] focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                         {isLoading ? "Signing in..." : "Sign In"}
                     </button>
-
-                    {/* Link to registration */}
-                    <Link
-                        href="/register"
-                        className="w-full block text-center py-2 px-4 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] focus:ring-offset-2"
-                    >
-                        Create an account
-                    </Link>
                 </form>
+
+                <p className="mt-6 text-center text-sm text-gray-500">
+                    Don&apos;t have an account?{" "}
+                    <Link href="/register" className="text-[#2D6A4F] hover:text-[#1B5E40] font-medium">
+                        Create one
+                    </Link>
+                </p>
             </div>
         </div>
     )

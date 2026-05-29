@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "weeknight.ai",
+  title: "WeekNight",
   description: "AI-powered weeknight meal planning",
 };
 

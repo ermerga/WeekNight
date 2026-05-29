@@ -1,8 +1,8 @@
 import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
-import AddMealForm from "@/components/meals/AddMealForm"
 import MealActions from "@/components/meals/MealActions"
+import AddMealModal from "@/components/meals/AddMealModal"
 
 export default async function MealsPage() {
     const session = await auth()
@@ -33,87 +33,86 @@ export default async function MealsPage() {
     })
 
     return (
-        <main className="bg-gray-100 min-h-[calc(100vh-60px)]"><div className="max-w-4xl mx-auto p-6">
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-3xl font-bold text-gray-900">Meals</h1>
-                <span className="text-sm bg-blue-100 text-blue-800 px-3 py-1 
-  rounded-full">
-                    {meals.length} recipes
-                </span>
-            </div>
+        <main className="bg-[#FAF9F6] min-h-[calc(100vh-60px)]">
+            <div className="max-w-4xl mx-auto p-6">
 
-            {/* Meals Grid */}
-            {meals.length === 0 ? (
-                <div className="bg-white rounded-lg shadow p-8 text-center   
-  mb-8">
-                    <p className="text-gray-900">No meals yet. Add your first recipe below!</p>
+                {/* Header */}
+                <div className="flex justify-between items-center mb-6">
+                    <div>
+                        <h1 className="text-2xl font-bold text-gray-900">Meals</h1>
+                        <p className="text-sm text-gray-500 mt-0.5">{meals.length} recipe{meals.length !== 1 ? "s" : ""} saved</p>
+                    </div>
+                    <AddMealModal foodItems={foodItems} />
                 </div>
-            ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                    {meals.map((meal) => (
-                        <div key={meal.id} className="bg-white rounded-lg    
-  shadow hover:shadow-md transition-shadow">
-                            <div className="p-4">
-                                <h2 className="text-xl font-semibold text-gray-900 mb-2">{meal.name}</h2>
 
-                                <div className="flex gap-3 text-sm text-gray-900 mb-3">
-                                    {meal.cuisine && (
-                                        <span className="bg-gray-100 px-2    
-  py-1 rounded">
-                                            {meal.cuisine}
-                                        </span>
+                {/* Meals Grid */}
+                {meals.length === 0 ? (
+                    <div className="bg-white rounded-xl border border-[#E8E5DF] p-12 text-center">
+                        <p className="text-gray-500 text-sm mb-4">No meals yet. Add your first recipe to get started.</p>
+                        <AddMealModal foodItems={foodItems} />
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {meals.map((meal) => (
+                            <div
+                                key={meal.id}
+                                className="bg-white rounded-xl border border-[#E8E5DF] hover:shadow-md transition-shadow"
+                            >
+                                <div className="p-5">
+                                    {/* Meal name + cuisine tag */}
+                                    <div className="flex items-start justify-between gap-2 mb-2">
+                                        <h2 className="text-base font-semibold text-gray-900 leading-snug">{meal.name}</h2>
+                                        {meal.cuisine && (
+                                            <span className="flex-shrink-0 bg-[#EEF5F0] text-[#2D6A4F] px-2 py-0.5 rounded-md text-xs font-medium">
+                                                {meal.cuisine}
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    {/* Meta row */}
+                                    <div className="flex items-center gap-3 text-xs text-gray-500 mb-3">
+                                        {meal.prepTime && <span>{meal.prepTime} min</span>}
+                                        <span>{meal.servings} servings</span>
+                                    </div>
+
+                                    {meal.description && (
+                                        <p className="text-gray-600 text-sm mb-3 leading-relaxed">{meal.description}</p>
                                     )}
-                                    {meal.prepTime && (
-                                        <span>{meal.prepTime} mins</span>
+
+                                    {/* Ingredients expand */}
+                                    <details className="text-sm">
+                                        <summary className="cursor-pointer text-[#2D6A4F] hover:text-[#1B5E40] font-medium text-xs select-none">
+                                            {meal.ingredients.length} ingredient{meal.ingredients.length !== 1 ? "s" : ""}
+                                        </summary>
+                                        <ul className="mt-2 space-y-0.5 text-xs text-gray-600 pl-1">
+                                            {meal.ingredients.map((ing) => (
+                                                <li key={ing.id} className="flex gap-1">
+                                                    <span className="text-gray-400">·</span>
+                                                    {ing.quantity} {ing.unit} {ing.foodItem.name}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </details>
+
+                                    {meal.userId === session.user?.id && (
+                                        <MealActions
+                                            meal={{
+                                                ...meal,
+                                                ingredients: meal.ingredients.map((i) => ({
+                                                    foodItemId: i.foodItemId,
+                                                    quantity: i.quantity,
+                                                    unit: i.unit,
+                                                })),
+                                            }}
+                                            foodItems={foodItems}
+                                        />
                                     )}
-                                    <span>{meal.servings} servings</span>
                                 </div>
-
-                                {meal.description && (
-                                    <p className="text-gray-900 text-sm mb-3">{meal.description}</p>
-                                )}
-
-                                <details className="text-sm">
-                                    <summary className="cursor-pointer text-blue-600 hover:text-blue-800">
-                                        {meal.ingredients.length} ingredients
-                                    </summary>
-                                    <ul className="mt-2 pl-4 text-gray-900">
-                                        {meal.ingredients.map((ing) => (
-                                            <li key={ing.id}>
-                                                {ing.quantity} {ing.unit} {ing.foodItem.name}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </details>
-
-                                {meal.userId === session.user?.id && (
-                                    <MealActions
-                                        meal={{
-                                            ...meal,
-                                            ingredients: meal.ingredients.map((i) => ({
-                                                foodItemId: i.foodItemId,
-                                                quantity: i.quantity,
-                                                unit: i.unit,
-                                            })),
-                                        }}
-                                        foodItems={foodItems}
-                                    />
-                                )}
                             </div>
-                        </div>
-                    ))}
-                </div>
-            )}
-
-            {/* Add Meal Form */}
-            <div className="bg-white rounded-lg shadow">
-                <div className="p-4 border-b border-gray-200">
-                    <h2 className="text-lg font-semibold text-gray-900">Add New Meal</h2>
-                </div>
-                <div className="p-4">
-                    <AddMealForm foodItems={foodItems} />
-                </div>
+                        ))}
+                    </div>
+                )}
             </div>
-        </div></main>
+        </main>
     )
 }

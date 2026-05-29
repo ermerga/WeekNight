@@ -21,7 +21,7 @@ export default function Nav({ isSignedIn }: { isSignedIn: boolean }) {
             backgroundColor: "#fff",
         }}>
             <span style={{ fontWeight: "bold", marginRight: "auto", color: "#000" }}>
-                weeknight.ai
+                WeekNight
             </span>
 
             {links.map((link) => (
