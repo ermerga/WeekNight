@@ -13,10 +13,8 @@ export default async function MealsPage() {
 
     const meals = await prisma.meal.findMany({
         where: {
-            OR: [
-                { userId: session.user?.id },
-                { isPublic: true },
-            ],
+            userId: session.user?.id,
+            hidden: false,
         },
         include: {
             ingredients: {
@@ -94,19 +92,17 @@ export default async function MealsPage() {
                                         </ul>
                                     </details>
 
-                                    {meal.userId === session.user?.id && (
-                                        <MealActions
-                                            meal={{
-                                                ...meal,
-                                                ingredients: meal.ingredients.map((i) => ({
-                                                    foodItemId: i.foodItemId,
-                                                    quantity: i.quantity,
-                                                    unit: i.unit,
-                                                })),
-                                            }}
-                                            foodItems={foodItems}
-                                        />
-                                    )}
+                                    <MealActions
+                                        meal={{
+                                            ...meal,
+                                            ingredients: meal.ingredients.map((i) => ({
+                                                foodItemId: i.foodItemId,
+                                                quantity: i.quantity,
+                                                unit: i.unit,
+                                            })),
+                                        }}
+                                        foodItems={foodItems}
+                                    />
                                 </div>
                             </div>
                         ))}

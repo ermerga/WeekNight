@@ -58,7 +58,7 @@ const tools: Anthropic.Tool[] = [
             properties: {
                 day: {
                     type: "string",
-                    description: "The day of the week (e.g. 'monday') OR a specific date (e.g. '2026-02-28'). Use a specific date when the user mentions an explicit date like 'February 28th'.",
+                    description: "MUST be a specific date in YYYY-MM-DD format (e.g. '2026-05-29'). Never pass a day name like 'monday'. Calculate the exact date from the current date in your system prompt.",
                 },
                 meal_name: {
                     type: "string",
@@ -138,7 +138,7 @@ const tools: Anthropic.Tool[] = [
             properties: {
                 day: {
                     type: "string",
-                    description: "The day of the week (e.g. 'monday') OR a specific date (e.g. '2026-02-28'). Use a specific date when the user mentions an explicit date like 'February 28th'.",
+                    description: "MUST be a specific date in YYYY-MM-DD format (e.g. '2026-05-29'). Never pass a day name like 'monday'. Calculate the exact date from the current date in your system prompt.",
                 },
                 meal_name: {
                     type: "string",
@@ -190,7 +190,18 @@ function getSystemPrompt(): string {
     const tomorrowName = dayDisplayNames[(now.getDay() + 1) % 7]
     const dateStr = `${monthNames[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`
 
-    return `You are a weekly meal planner assistant. Today is ${todayName}, ${dateStr}. Use this to resolve relative date references correctly: "tonight" and "today" = ${todayName.toLowerCase()}, "tomorrow" = ${tomorrowName.toLowerCase()}, "next [day]" = the [day] of next week. Always pass the correct day name to the add-meal-to-plan tool. You help users plan meals and manage their weekly meal schedule. When a user wants to add or remove a meal, use the appropriate tool with whatever description they provide - even if it's vague like 'the chicken dish' or 'something Italian'. The system uses fuzzy matching and semantic search to automatically find the best match. If no match is found, the tool will report that and you can ask for clarification then. Don't ask for exact meal names upfront - just try the tool first. If a user asks an unrelated question, respond that you can only help with meal planning. The user can also add items to the shopping list that are not associated to a specific meal.`
+    return `You are a weekly meal planner assistant. Today is ${todayName}, ${dateStr}.
+
+CRITICAL — date handling: Always pass the "day" parameter as a specific YYYY-MM-DD date (e.g. "${year}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}"), NEVER as a day name like "monday" or "friday". Calculate the exact date using today's date above.
+
+Date reference guide (from today ${todayName} ${dateStr}):
+- "tonight" / "today" → today's date
+- "tomorrow" → tomorrow's date
+- "this [day]" → the upcoming occurrence of that day this week (or today if it matches)
+- "next [day]" or "[day] of next week" → that day in the FOLLOWING week (always 7+ days from today)
+- "next week" with no specific day → start from next Sunday and assign days across the week
+
+You help users plan meals and manage their weekly meal schedule. When a user wants to add or remove a meal, use the appropriate tool with whatever description they provide - even if it's vague like 'the chicken dish' or 'something Italian'. The system uses fuzzy matching and semantic search to automatically find the best match. If no match is found, the tool will report that and you can ask for clarification then. Don't ask for exact meal names upfront - just try the tool first. If a user asks an unrelated question, respond that you can only help with meal planning. The user can also add items to the shopping list that are not associated to a specific meal.`
 }
 
 function getDateFromDay(day: string): string {

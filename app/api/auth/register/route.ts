@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import bcrypt from "bcrypt"
+import { copyPresetMealsToUser } from "@/lib/copy-preset-meals"
 
 export async function POST(request: Request) {
     try {
@@ -47,7 +48,10 @@ export async function POST(request: Request) {
             }
         })
 
-        // 7. Return success response
+        // 7. Copy preset meals to the new user
+        await copyPresetMealsToUser(user.id)
+
+        // 8. Return success response
         return NextResponse.json(
             { message: "User created successfully", userId: user.id },
             { status: 201 }

@@ -39,10 +39,8 @@ export async function POST(request: Request) {
         // First, try Fuse.js for exact/typo matching                                                      
         const candidateMeals = await prisma.meal.findMany({
             where: {
-                OR: [
-                    { userId: session.user.id },
-                    { isPublic: true }
-                ]
+                userId: session.user.id,
+                hidden: false,
             }
         })
 
@@ -67,7 +65,8 @@ export async function POST(request: Request) {
                 SELECT id, name, description,                                                              
                         1 - (embedding <=> ${queryEmbedding}::vector) as similarity                         
                 FROM meals                                                                                 
-                WHERE (user_id = ${session.user.id} OR is_public = true)                                   
+                WHERE user_id = ${session.user.id}
+                    AND hidden = false
                     AND embedding IS NOT NULL                                                                
                 ORDER BY embedding <=> ${queryEmbedding}::vector                                           
                 LIMIT 1                                                                                    

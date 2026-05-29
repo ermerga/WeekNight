@@ -6,12 +6,16 @@ const prisma = new PrismaClient();
 async function createMealWithEmbedding(data: any) {
   const meal = await prisma.meal.create(data);
 
-  const embedding = await generateEmbedding(meal.name + " " + (meal.description || ""));
-  await prisma.$executeRaw`
-          UPDATE meals
-          SET embedding = ${embedding}::vector
-          WHERE id = ${meal.id}
-      `;
+  try {
+    const embedding = await generateEmbedding(meal.name + " " + (meal.description || ""));
+    await prisma.$executeRaw`
+            UPDATE meals
+            SET embedding = ${embedding}::vector
+            WHERE id = ${meal.id}
+        `;
+  } catch (e) {
+    console.log(`  ⚠ Embedding skipped for ${meal.name} (non-fatal)`);
+  }
 
   return meal;
 }
@@ -28,6 +32,12 @@ async function seedMealIfMissing(name: string, data: any) {
 
 async function main() {
   console.log('🌱 Seeding database...');
+
+  // Backfill: mark any existing public/unowned meals as presets
+  await prisma.meal.updateMany({
+    where: { isPublic: true, userId: null },
+    data: { isPreset: true },
+  });
 
   // Seed common food items
   const foodItems = [
@@ -113,7 +123,7 @@ async function main() {
         servings: 4,
         prepTime: 30,
         cuisine: 'American',
-        isPublic: true,
+        isPreset: true,
         steps: [
           'Season chicken breasts on both sides with salt, pepper, and paprika.',
           'Heat a grill pan or skillet over medium-high heat and add a drizzle of oil.',
@@ -143,7 +153,7 @@ async function main() {
         servings: 4,
         prepTime: 45,
         cuisine: 'Italian',
-        isPublic: true,
+        isPreset: true,
         steps: [
           'Bring a large pot of salted water to a boil.',
           'Dice onion and mince garlic. Chop tomatoes.',
@@ -174,7 +184,7 @@ async function main() {
         servings: 4,
         prepTime: 20,
         cuisine: 'Mexican',
-        isPublic: true,
+        isPreset: true,
         steps: [
           'Dice onion finely.',
           'Brown ground beef in a skillet over medium-high heat, breaking it apart as it cooks.',
@@ -203,7 +213,7 @@ async function main() {
         servings: 4,
         prepTime: 25,
         cuisine: 'American',
-        isPublic: true,
+        isPreset: true,
         steps: [
           'Preheat oven to 400°F. Line a baking sheet with foil.',
           'Cut broccoli into florets and toss with olive oil, salt, and pepper. Spread on one side of the baking sheet.',
@@ -234,7 +244,7 @@ async function main() {
         servings: 4,
         prepTime: 25,
         cuisine: 'Asian',
-        isPublic: true,
+        isPreset: true,
         steps: [
           'Cook rice according to package instructions.',
           'Slice chicken breast into thin strips. Slice bell peppers and onion.',
@@ -265,7 +275,7 @@ async function main() {
         servings: 6,
         prepTime: 40,
         cuisine: 'American',
-        isPublic: true,
+        isPreset: true,
         steps: [
           'Dice onion and carrots. Mince garlic.',
           'Heat olive oil in a large pot over medium heat.',

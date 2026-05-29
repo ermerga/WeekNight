@@ -4,6 +4,7 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "./prisma"
 import Credentials from "next-auth/providers/credentials"
 import bcrypt from "bcrypt"
+import { copyPresetMealsToUser } from "./copy-preset-meals"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
@@ -54,6 +55,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
     }),
   ],
+  events: {
+    async createUser({ user }) {
+      if (user.id) {
+        await copyPresetMealsToUser(user.id)
+      }
+    },
+  },
   callbacks: {
     jwt({ token, user }) {
       // Add user ID to JWT token when user signs in
