@@ -192,7 +192,7 @@ function getSystemPrompt(): string {
 
     return `You are a weekly meal planner assistant. Today is ${todayName}, ${dateStr}.
 
-CRITICAL — date handling: Always pass the "day" parameter as a specific YYYY-MM-DD date (e.g. "${year}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}"), NEVER as a day name like "monday" or "friday". Calculate the exact date using today's date above.
+CRITICAL — date handling: Always pass the "day" parameter as a specific YYYY-MM-DD date (e.g. "${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}"), NEVER as a day name like "monday" or "friday". Calculate the exact date using today's date above.
 
 Date reference guide (from today ${todayName} ${dateStr}):
 - "tonight" / "today" → today's date
