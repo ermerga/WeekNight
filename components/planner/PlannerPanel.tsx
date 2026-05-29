@@ -147,7 +147,7 @@ export default function PlannerPanel({
                                                 </div>
                                                 <Link
                                                     href={`/cook/${pm.id}`}
-                                                    className="flex-shrink-0 text-[10px] text-white rounded px-2 py-1 min-h-[26px] flex items-center font-medium hover:opacity-80 transition-opacity"
+                                                    className="flex-shrink-0 text-[10px] text-white rounded px-2 min-h-[44px] flex items-center font-medium hover:opacity-80 transition-opacity"
                                                     style={{ background: "#1a1a1a" }}
                                                 >
                                                     {pm.isCompleted ? "✓" : "▶"}
@@ -251,7 +251,7 @@ export default function PlannerPanel({
                                 </div>
                                 <Link
                                     href={`/cook/${pm.id}`}
-                                    className="flex-shrink-0 text-white text-[11px] font-medium px-3 py-1.5 rounded-md hover:opacity-80 transition-opacity"
+                                    className="flex-shrink-0 text-white text-[11px] font-medium px-3 min-h-[44px] flex items-center rounded-md hover:opacity-80 transition-opacity"
                                     style={{ background: "#1a1a1a" }}
                                 >
                                     {pm.isCompleted ? "✓" : "Cook"}
@@ -381,7 +381,7 @@ export default function PlannerPanel({
                                                         </div>
                                                         <Link
                                                             href={`/cook/${pm.id}`}
-                                                            className="flex-shrink-0 text-[10px] text-white rounded px-2 py-1 min-h-[26px] flex items-center font-medium hover:opacity-80 transition-opacity"
+                                                            className="flex-shrink-0 text-[10px] text-white rounded px-2 min-h-[44px] flex items-center font-medium hover:opacity-80 transition-opacity"
                                                             style={{ background: "#1a1a1a" }}
                                                         >
                                                             {pm.isCompleted ? "✓" : "Cook"}
