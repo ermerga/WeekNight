@@ -63,7 +63,7 @@ export default function ShoppingListItems({ items, weekKey }: Props) {
                                 checked={isChecked}
                                 onChange={() => toggle(item.name)}
                                 onClick={(e) => e.stopPropagation()}
-                                className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                                className="w-5 h-5 rounded border-gray-300 text-[#2D6A4F] focus:ring-[#2D6A4F] cursor-pointer"
                             />
                             <span className={`font-medium text-gray-900 ${isChecked ? "line-through" : ""}`}>
                                 {item.name}

@@ -29,7 +29,7 @@ export default function Nav({ isSignedIn }: { isSignedIn: boolean }) {
                     key={link.href}
                     href={link.href}
                     style={{
-                        color: pathname === link.href ? "#2563eb" : "#666",
+                        color: pathname === link.href ? "#2D6A4F" : "#666",
                         textDecoration: "none",
                         fontWeight: pathname === link.href ? "600" : "400",
                         display: "inline-flex",
