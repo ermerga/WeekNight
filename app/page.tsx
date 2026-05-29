@@ -83,8 +83,7 @@ export default async function Home({
             {/* Chat — top on mobile, right card on desktop */}
             <div className="order-1 md:order-2 flex-1 bg-white border-b md:border-b-0 md:rounded-xl md:shadow-sm md:border border-gray-200 flex flex-col overflow-hidden min-h-0">
                 <div className="flex-shrink-0 px-4 py-3 border-b border-gray-200">
-                    <h1 className="font-semibold text-gray-900 text-sm">Plan your week</h1>
-                    <p className="text-xs text-gray-500 mt-0.5">Ask me to add, remove, or suggest meals</p>
+                    <h1 className="font-semibold text-gray-900 text-base">Plan your week</h1>
                 </div>
                 <div className="flex-1 overflow-hidden min-h-0">
                     <ChatBox />
