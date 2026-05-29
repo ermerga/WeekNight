@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
 
 type Message = {
     id: string
@@ -104,11 +106,11 @@ export default function ChatBox() {
     }
 
     return (
-        <div className="flex flex-col h-full w-full overflow-hidden">
+        <div className="flex flex-col h-full w-full overflow-hidden bg-white">
             {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div className="flex-1 overflow-y-auto px-4 py-5 space-y-3">
                 {messages.length === 0 && !isLoading && (
-                    <div className="flex flex-col items-center justify-center h-full gap-3 text-center px-6">
+                    <div className="flex flex-col items-center justify-center h-full gap-2 text-center px-6">
                         <p className="text-sm font-medium text-gray-700">What are you eating this week?</p>
                         <p className="text-xs text-gray-400 leading-relaxed">Try: "Add pasta for Tuesday dinner" or "Suggest a healthy breakfast"</p>
                     </div>
@@ -116,31 +118,55 @@ export default function ChatBox() {
                 {messages.map((message) => (
                     <div
                         key={message.id}
-                        className={`flex ${message.role === "user" ?
-                            "justify-end" : "justify-start"}`}
+                        className={`flex ${message.role === "user" ? "justify-end" : "justify-start items-end gap-2"}`}
                     >
+                        {message.role === "assistant" && (
+                            <div className="w-7 h-7 rounded-full bg-[#2D6A4F] text-white text-xs font-bold flex items-center justify-center flex-shrink-0">
+                                W
+                            </div>
+                        )}
                         <div
-                            className={`max-w-[80%] rounded-2xl px-4 py-2 ${message.role === "user"
-                                ? "bg-blue-600 text-white"
-                                : "bg-gray-100 text-gray-900"
-                                }`}
+                            className={`max-w-[75%] px-4 py-2.5 text-sm leading-relaxed ${
+                                message.role === "user"
+                                    ? "bg-[#2D6A4F] text-white rounded-[18px] rounded-br-[4px] whitespace-pre-wrap"
+                                    : "bg-white border border-[#E8E5DF] text-gray-900 rounded-[18px] rounded-bl-[4px]"
+                            }`}
                         >
-                            <p
-                                className="whitespace-pre-wrap">{message.content}</p>
+                            {message.role === "user" ? (
+                                message.content
+                            ) : (
+                                <ReactMarkdown
+                                    remarkPlugins={[remarkGfm]}
+                                    components={{
+                                        p: ({ children }) => <p className="mb-1 last:mb-0">{children}</p>,
+                                        strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+                                        ul: ({ children }) => <ul className="list-disc list-inside space-y-0.5 my-1">{children}</ul>,
+                                        ol: ({ children }) => <ol className="list-decimal list-inside space-y-0.5 my-1">{children}</ol>,
+                                        li: ({ children }) => <li className="leading-relaxed">{children}</li>,
+                                        code: ({ children }) => <code className="bg-gray-100 rounded px-1 py-0.5 text-xs font-mono">{children}</code>,
+                                        table: ({ children }) => <div className="overflow-x-auto my-2"><table className="text-xs border-collapse w-full">{children}</table></div>,
+                                        thead: ({ children }) => <thead className="bg-gray-50">{children}</thead>,
+                                        th: ({ children }) => <th className="border border-[#E8E5DF] px-2 py-1.5 text-left font-semibold text-gray-700">{children}</th>,
+                                        td: ({ children }) => <td className="border border-[#E8E5DF] px-2 py-1.5 text-gray-600">{children}</td>,
+                                    }}
+                                >
+                                    {message.content}
+                                </ReactMarkdown>
+                            )}
                         </div>
                     </div>
                 ))}
 
                 {isLoading && (
-                    <div className="flex justify-start">
-                        <div className="bg-gray-100 rounded-2xl px-4 py-2">
-                            <div className="flex space-x-2">
-                                <div className="w-2 h-2 bg-gray-400          
-  rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
-                                <div className="w-2 h-2 bg-gray-400          
-  rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
-                                <div className="w-2 h-2 bg-gray-400          
-  rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
+                    <div className="flex justify-start items-end gap-2">
+                        <div className="w-7 h-7 rounded-full bg-[#2D6A4F] text-white text-xs font-bold flex items-center justify-center flex-shrink-0">
+                            W
+                        </div>
+                        <div className="bg-white border border-[#E8E5DF] rounded-[18px] rounded-bl-[4px] px-4 py-3">
+                            <div className="flex space-x-1.5">
+                                <div className="w-2 h-2 bg-gray-300 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                                <div className="w-2 h-2 bg-gray-300 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                                <div className="w-2 h-2 bg-gray-300 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
                             </div>
                         </div>
                     </div>
@@ -150,14 +176,13 @@ export default function ChatBox() {
             </div>
 
             {/* Input Area */}
-            <div className="border-t border-gray-200 p-4 bg-gray-50">
-                <form onSubmit={handleSubmit} className="flex gap-3">
+            <div className="border-t border-gray-100 px-4 py-3 bg-white">
+                <form onSubmit={handleSubmit} className="flex items-end gap-2">
                     <textarea
                         ref={textareaRef}
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={(e) => {
-                            // Submit on Enter (without Shift)                                                             
                             if (e.key === 'Enter' && !e.shiftKey) {
                                 e.preventDefault()
                                 handleSubmit(e)
@@ -165,20 +190,17 @@ export default function ChatBox() {
                         }}
                         placeholder="Tell me what you want to eat..."
                         rows={1}
-                        className="flex-1 px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2     
-                                    focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-500 text-gray-900 resize-none          
-                                    overflow-hidden"
+                        className="flex-1 px-4 py-2.5 bg-gray-100 rounded-full focus:outline-none placeholder:text-gray-400 text-gray-900 text-sm resize-none overflow-hidden leading-relaxed"
                         disabled={isLoading}
                     />
                     <button
                         type="submit"
                         disabled={!input.trim() || isLoading}
-                        className="px-6 py-3 bg-blue-600 text-white          
-  rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2               
-  focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50                  
-  disabled:cursor-not-allowed transition-colors"
+                        className="w-9 h-9 flex-shrink-0 flex items-center justify-center bg-[#2D6A4F] rounded-full hover:bg-[#1B5E40] focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] focus:ring-offset-2 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                     >
-                        Send
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+                            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+                        </svg>
                     </button>
                 </form>
             </div>

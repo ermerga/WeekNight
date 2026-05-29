@@ -197,7 +197,7 @@ function getDateFromDay(day: string): string {
     const targetIndex = days.indexOf(day.toLowerCase())
 
     let daysUntil = targetIndex - todayIndex
-    if (daysUntil <= 0) daysUntil += 7
+    if (daysUntil < 0) daysUntil += 7
 
     const targetDate = new Date(today)
     targetDate.setDate(today.getDate() + daysUntil)
@@ -321,7 +321,7 @@ export async function POST(request: Request) {
 
     const response = await anthropic.messages.create({
         model: "claude-sonnet-4-6",
-        max_tokens: 1024,
+        max_tokens: 4096,
         system: systemPrompt,
         messages: [
             ...body.conversationHistory,
@@ -330,166 +330,111 @@ export async function POST(request: Request) {
         tools
     })
 
-    if (response.stop_reason === "tool_use") {
-        // Find ALL tool_use blocks                                                                                                     
-        const toolUseBlocks = response.content.filter(block => block.type === "tool_use")
+    // Agentic loop: keep processing tool calls until Claude says it's done
+    const MAX_ITERATIONS = 10
+    const agentMessages: Anthropic.MessageParam[] = [
+        ...body.conversationHistory,
+        { role: "user", content: body.message }
+    ]
 
-        // Execute each tool and collect results                                                                                        
+    let currentResponse = response
+    let iterations = 0
+
+    while (
+        (currentResponse.stop_reason === "tool_use" || currentResponse.stop_reason === "max_tokens") &&
+        iterations < MAX_ITERATIONS
+    ) {
+        iterations++
+
+        const toolUseBlocks = currentResponse.content.filter(block => block.type === "tool_use")
+
+        // If we hit max_tokens with no tool calls, Claude got cut off mid-text — stop and report
+        if (toolUseBlocks.length === 0) break
+
+        // Add Claude's response (which contains the tool_use blocks) to the message history
+        agentMessages.push({ role: "assistant", content: currentResponse.content })
+
+        // Execute each tool call and collect results
         const toolResults: Anthropic.ToolResultBlockParam[] = []
 
         for (const toolUseBlock of toolUseBlocks) {
-            if (toolUseBlock.type === "tool_use" && toolUseBlock.name === "add-meal-to-plan") {
+            if (toolUseBlock.type !== "tool_use") continue
+
+            let result: unknown
+
+            if (toolUseBlock.name === "add-meal-to-plan") {
                 const { day, meal_name, meal_type } = toolUseBlock.input as AddMealInput
-
-                // Convert "monday" to actual date                                                                                      
-
                 const targetDate = getDateFromDay(day)
-
                 const url = new URL('/api/tools/add-to-plan', request.url)
                 const toolResponse = await fetch(url, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Cookie': request.headers.get('cookie') || ''
-                    },
-                    body: JSON.stringify({
-                        mealName: meal_name,
-                        date: targetDate,
-                        mealType: meal_type
-                    })
+                    headers: { 'Content-Type': 'application/json', 'Cookie': request.headers.get('cookie') || '' },
+                    body: JSON.stringify({ mealName: meal_name, date: targetDate, mealType: meal_type })
                 })
+                result = await toolResponse.json()
 
-                const result = await toolResponse.json()
-
-                toolResults.push({
-                    type: "tool_result",
-                    tool_use_id: toolUseBlock.id,
-                    content: JSON.stringify(result)
-                })
-            } else if (toolUseBlock.type === "tool_use" && toolUseBlock.name === "create-meal") {
+            } else if (toolUseBlock.name === "create-meal") {
                 const { name, description, servings, prepTime, cuisine, steps, ingredients } = toolUseBlock.input as CreateMealInput
-
                 const url = new URL('/api/tools/create-meal', request.url)
                 const toolResponse = await fetch(url, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Cookie': request.headers.get('cookie') || ''
-                    },
-                    body: JSON.stringify({
-                        name,
-                        description,
-                        servings,
-                        prepTime,
-                        cuisine,
-                        steps,
-                        ingredients
-                    })
+                    headers: { 'Content-Type': 'application/json', 'Cookie': request.headers.get('cookie') || '' },
+                    body: JSON.stringify({ name, description, servings, prepTime, cuisine, steps, ingredients })
                 })
+                result = await toolResponse.json()
 
-                const result = await toolResponse.json()
-
-                toolResults.push({
-                    type: "tool_result",
-                    tool_use_id: toolUseBlock.id,
-                    content: JSON.stringify(result)
-                })
-
-            } else if (toolUseBlock.type === "tool_use" && toolUseBlock.name === "remove-meal-from-plan") {
+            } else if (toolUseBlock.name === "remove-meal-from-plan") {
                 const { day, meal_name, meal_type } = toolUseBlock.input as RemoveMealInput
-
                 const targetDate = getDateFromDay(day)
-
                 const url = new URL('/api/tools/remove-from-plan', request.url)
                 const toolResponse = await fetch(url, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Cookie': request.headers.get('cookie') || ''
-                    },
-                    body: JSON.stringify({
-                        mealName: meal_name,
-                        date: targetDate,
-                        mealType: meal_type  // Will be undefined if not provided                                                                 
-                    })
+                    headers: { 'Content-Type': 'application/json', 'Cookie': request.headers.get('cookie') || '' },
+                    body: JSON.stringify({ mealName: meal_name, date: targetDate, mealType: meal_type })
                 })
+                result = await toolResponse.json()
 
-                const result = await toolResponse.json()
-
-                toolResults.push({
-                    type: "tool_result",
-                    tool_use_id: toolUseBlock.id,
-                    content: JSON.stringify(result)
-                })
-            } else if (toolUseBlock.type === "tool_use" && toolUseBlock.name === "add-item-shopping-list") {
-                const { name, quantity, unit, notes } = toolUseBlock.input as ShoppingListAdd; 
-
-
+            } else if (toolUseBlock.name === "add-item-shopping-list") {
+                const { name, quantity, unit, notes } = toolUseBlock.input as ShoppingListAdd
                 const url = new URL('/api/tools/add-list', request.url)
                 const toolResponse = await fetch(url, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Cookie': request.headers.get('cookie') || ''
-                    },
-                    body: JSON.stringify({
-                        name: name,
-                        quantity: quantity,
-                        unit: unit,
-                        notes: notes                                                               
-                    })
+                    headers: { 'Content-Type': 'application/json', 'Cookie': request.headers.get('cookie') || '' },
+                    body: JSON.stringify({ name, quantity, unit, notes })
                 })
-
-                const result = await toolResponse.json()
-
-                toolResults.push({
-                    type: "tool_result",
-                    tool_use_id: toolUseBlock.id,
-                    content: JSON.stringify(result)
-                })
+                result = await toolResponse.json()
             }
+
+            toolResults.push({
+                type: "tool_result",
+                tool_use_id: toolUseBlock.id,
+                content: JSON.stringify(result)
+            })
         }
 
-        // Send ALL tool results back to Claude                                                                                         
-        const followUpResponse = await anthropic.messages.create({
+        // Add tool results and get Claude's next response
+        agentMessages.push({ role: "user", content: toolResults })
+
+        currentResponse = await anthropic.messages.create({
             model: "claude-sonnet-4-6",
-            max_tokens: 1024,
+            max_tokens: 4096,
             system: systemPrompt,
-            messages: [
-                ...body.conversationHistory,
-                { role: "user", content: body.message },
-                { role: "assistant", content: response.content },
-                { role: "user", content: toolResults }
-            ],
+            messages: agentMessages,
             tools
-        })
-
-        // Return Claude's follow-up response to the user                                                                               
-        const assistantMessage = followUpResponse.content[0].type === "text"
-            ? followUpResponse.content[0].text
-            : ""
-
-        await prisma.chatMessage.create({
-            data: {
-                userId: session.user.id,
-                role: "assistant",
-                content: assistantMessage
-            }
-        })
-        return NextResponse.json({
-            response: assistantMessage,
-            conversationHistory: [
-                ...body.conversationHistory,
-                { role: "user", content: body.message },
-                { role: "assistant", content: assistantMessage }
-            ]
         })
     }
 
-    const assistantMessage = response.content[0].type === "text"
-        ? response.content[0].text
-        : "Unable to get response"
+    // Extract final text response
+    const textBlock = currentResponse.content.find(block => block.type === "text")
+    let assistantMessage = textBlock?.type === "text" ? textBlock.text : ""
 
+    if (iterations >= MAX_ITERATIONS) {
+        assistantMessage += "\n\n(Note: I hit the limit for a single request. If anything was missed, just ask me to continue.)"
+    }
+
+    if (!assistantMessage) {
+        assistantMessage = "Done! Let me know if you'd like any changes."
+    }
 
     await prisma.chatMessage.create({
         data: {
