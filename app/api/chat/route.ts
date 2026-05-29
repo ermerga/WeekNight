@@ -182,7 +182,16 @@ const tools: Anthropic.Tool[] = [
 ]
 
 
-const systemPrompt = "You are a weekly meal planner assistant. You help users plan meals and manage their weekly meal schedule. When a user wants to add or remove a meal, use the appropriate tool with whatever description they provide - even if it's vague like 'the chicken dish' or 'something Italian'. The system uses fuzzy matching and semantic search to automatically find the best match. If no match is found, the tool will report that and you can ask for clarification then. Don't ask for exact meal names upfront - just try the tool first. If a user asks an unrelated question,respond that you can only help with meal planning. The user can also add items to the shopping list that are not associated to a specific meal."
+function getSystemPrompt(): string {
+    const now = new Date()
+    const dayDisplayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+    const todayName = dayDisplayNames[now.getDay()]
+    const tomorrowName = dayDisplayNames[(now.getDay() + 1) % 7]
+    const dateStr = `${monthNames[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`
+
+    return `You are a weekly meal planner assistant. Today is ${todayName}, ${dateStr}. Use this to resolve relative date references correctly: "tonight" and "today" = ${todayName.toLowerCase()}, "tomorrow" = ${tomorrowName.toLowerCase()}, "next [day]" = the [day] of next week. Always pass the correct day name to the add-meal-to-plan tool. You help users plan meals and manage their weekly meal schedule. When a user wants to add or remove a meal, use the appropriate tool with whatever description they provide - even if it's vague like 'the chicken dish' or 'something Italian'. The system uses fuzzy matching and semantic search to automatically find the best match. If no match is found, the tool will report that and you can ask for clarification then. Don't ask for exact meal names upfront - just try the tool first. If a user asks an unrelated question, respond that you can only help with meal planning. The user can also add items to the shopping list that are not associated to a specific meal.`
+}
 
 function getDateFromDay(day: string): string {
     // Check if input is already a specific date (e.g. "2026-02-28")
@@ -322,7 +331,7 @@ export async function POST(request: Request) {
     const response = await anthropic.messages.create({
         model: "claude-sonnet-4-6",
         max_tokens: 4096,
-        system: systemPrompt,
+        system: getSystemPrompt(),
         messages: [
             ...body.conversationHistory,
             { role: "user", content: body.message }
@@ -418,7 +427,7 @@ export async function POST(request: Request) {
         currentResponse = await anthropic.messages.create({
             model: "claude-sonnet-4-6",
             max_tokens: 4096,
-            system: systemPrompt,
+            system: getSystemPrompt(),
             messages: agentMessages,
             tools
         })
