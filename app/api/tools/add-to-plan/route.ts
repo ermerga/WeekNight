@@ -47,8 +47,8 @@ export async function POST(request: Request) {
         })
 
         const fuse = new Fuse(candidateMeals, {
-            keys: ['name'],
-            threshold: 0.4,
+            keys: ['name', 'cuisine', 'description'],
+            threshold: 0.5,
             includeScore: true
         })
 
@@ -56,7 +56,7 @@ export async function POST(request: Request) {
 
         let meal;
 
-        if (fuseResults.length > 0 && fuseResults[0].score! <= 0.4) {
+        if (fuseResults.length > 0 && fuseResults[0].score! <= 0.5) {
             // Good fuzzy match found                                                                      
             meal = fuseResults[0].item
         } else {

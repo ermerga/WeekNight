@@ -93,13 +93,17 @@ export async function POST(request: Request) {
             },
         })
 
-        const embedding = await generateEmbedding(name + " " + (description || ""))
-
-        await prisma.$executeRaw`                                                                          
-            UPDATE meals                                                                                   
-            SET embedding = ${embedding}::vector                                                           
-            WHERE id = ${meal.id}                                                                          
+        // Embedding is best-effort — meal is still usable via fuzzy search if this fails
+        try {
+            const embedding = await generateEmbedding(name + " " + (description || ""))
+            await prisma.$executeRaw`
+                UPDATE meals
+                SET embedding = ${embedding}::vector
+                WHERE id = ${meal.id}
             `
+        } catch (embeddingError) {
+            console.error("Embedding generation failed (non-fatal):", embeddingError)
+        }
 
         return NextResponse.json({
             success: true,
