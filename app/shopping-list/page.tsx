@@ -144,7 +144,7 @@ export default async function ShoppingListPage({
                     <div className="flex items-center gap-4 mt-1">
                         <Link
                             href={`/shopping-list?week=${formatDateForUrl(prevWeek)}`}
-                            className="text-gray-700 hover:text-gray-900"
+                            className="text-gray-700 hover:text-gray-900 min-h-[44px] inline-flex items-center px-1"
                         >
                             ← Prev
                         </Link>
@@ -153,13 +153,13 @@ export default async function ShoppingListPage({
                         </p>
                         <Link
                             href={`/shopping-list?week=${formatDateForUrl(nextWeek)}`}
-                            className="text-gray-700 hover:text-gray-900"
+                            className="text-gray-700 hover:text-gray-900 min-h-[44px] inline-flex items-center px-1"
                         >
                             Next →
                         </Link>
                     </div>
                 </div>
-                <span className="text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
+                <span className="text-sm bg-[#EEF5F0] text-[#2D6A4F] px-3 py-1 rounded-full font-medium">
                     {shoppingList.length} items to buy
                 </span>
             </div>
@@ -170,7 +170,7 @@ export default async function ShoppingListPage({
                         <p className="text-gray-900 mb-4">No meal plan for this week.</p>
                         <Link
                             href="/planner"
-                            className="text-blue-600 hover:text-blue-800 font-medium"
+                            className="text-[#2D6A4F] hover:text-[#1B5E40] font-medium"
                         >
                             Go to Planner →
                         </Link>
