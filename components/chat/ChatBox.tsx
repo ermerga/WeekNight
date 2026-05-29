@@ -16,6 +16,8 @@ export default function ChatBox() {
     const [messages, setMessages] = useState<Message[]>([])
     const [input, setInput] = useState("")
     const [isLoading, setIsLoading] = useState(false)
+    // True when we detected an orphaned user message on mount (response still pending from a previous session)
+    const [awaitingHistoryResponse, setAwaitingHistoryResponse] = useState(false)
     const messagesEndRef = useRef<HTMLDivElement>(null)
     const textareaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -39,14 +41,49 @@ export default function ChatBox() {
             if (res.ok) {
                 const data = await res.json()
                 setMessages(data)
+                // If the last saved message is from the user, a response was in-flight when
+                // the user navigated away. Start polling until the assistant reply arrives.
+                if (data.length > 0 && data[data.length - 1].role === "user") {
+                    setAwaitingHistoryResponse(true)
+                }
             }
         }
         loadHistory()
     }, [])
 
+    // Poll history every 2s when an orphaned user message is detected on mount
+    useEffect(() => {
+        if (!awaitingHistoryResponse) return
+
+        let attempts = 0
+        const MAX_ATTEMPTS = 60 // give up after 2 minutes
+
+        const poll = setInterval(async () => {
+            attempts++
+            if (attempts >= MAX_ATTEMPTS) {
+                setAwaitingHistoryResponse(false)
+                return
+            }
+            const res = await fetch("/api/chat/history")
+            if (res.ok) {
+                const data = await res.json()
+                if (data.length > 0 && data[data.length - 1].role === "assistant") {
+                    setMessages(data)
+                    setAwaitingHistoryResponse(false)
+                    router.refresh()
+                }
+            }
+        }, 2000)
+
+        return () => clearInterval(poll)
+    }, [awaitingHistoryResponse, router])
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        if (!input.trim() || isLoading) return
+        if (!input.trim() || isLoading || awaitingHistoryResponse) return
+
+        // Cancel any pending poll — user is starting a fresh message
+        setAwaitingHistoryResponse(false)
 
         const userMessage: Message = {
             id: Date.now().toString(),
@@ -157,7 +194,7 @@ export default function ChatBox() {
                     </div>
                 ))}
 
-                {isLoading && (
+                {(isLoading || awaitingHistoryResponse) && (
                     <div className="flex justify-start items-end gap-2">
                         <div className="w-7 h-7 rounded-full bg-[#2D6A4F] text-white text-xs font-bold flex items-center justify-center flex-shrink-0">
                             W
@@ -191,11 +228,11 @@ export default function ChatBox() {
                         placeholder="Tell me what you want to eat..."
                         rows={1}
                         className="flex-1 px-4 py-2.5 bg-gray-100 rounded-full focus:outline-none placeholder:text-gray-400 text-gray-900 text-sm resize-none overflow-hidden leading-relaxed"
-                        disabled={isLoading}
+                        disabled={isLoading || awaitingHistoryResponse}
                     />
                     <button
                         type="submit"
-                        disabled={!input.trim() || isLoading}
+                        disabled={!input.trim() || isLoading || awaitingHistoryResponse}
                         className="w-9 h-9 flex-shrink-0 flex items-center justify-center bg-[#2D6A4F] rounded-full hover:bg-[#1B5E40] focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] focus:ring-offset-2 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                     >
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
