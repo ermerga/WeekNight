@@ -382,10 +382,13 @@ export async function POST(request: Request) {
 
             let result: unknown
 
+            const baseUrl = process.env.NEXTAUTH_URL ||
+                (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
+
             if (toolUseBlock.name === "add-meal-to-plan") {
                 const { day, meal_name, meal_type } = toolUseBlock.input as AddMealInput
                 const targetDate = getDateFromDay(day)
-                const url = new URL('/api/tools/add-to-plan', request.url)
+                const url = new URL('/api/tools/add-to-plan', baseUrl)
                 const toolResponse = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Cookie': request.headers.get('cookie') || '' },
@@ -395,7 +398,7 @@ export async function POST(request: Request) {
 
             } else if (toolUseBlock.name === "create-meal") {
                 const { name, description, servings, prepTime, cuisine, steps, ingredients } = toolUseBlock.input as CreateMealInput
-                const url = new URL('/api/tools/create-meal', request.url)
+                const url = new URL('/api/tools/create-meal', baseUrl)
                 const toolResponse = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Cookie': request.headers.get('cookie') || '' },
@@ -406,7 +409,7 @@ export async function POST(request: Request) {
             } else if (toolUseBlock.name === "remove-meal-from-plan") {
                 const { day, meal_name, meal_type } = toolUseBlock.input as RemoveMealInput
                 const targetDate = getDateFromDay(day)
-                const url = new URL('/api/tools/remove-from-plan', request.url)
+                const url = new URL('/api/tools/remove-from-plan', baseUrl)
                 const toolResponse = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Cookie': request.headers.get('cookie') || '' },
@@ -416,7 +419,7 @@ export async function POST(request: Request) {
 
             } else if (toolUseBlock.name === "add-item-shopping-list") {
                 const { name, quantity, unit, notes } = toolUseBlock.input as ShoppingListAdd
-                const url = new URL('/api/tools/add-list', request.url)
+                const url = new URL('/api/tools/add-list', baseUrl)
                 const toolResponse = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Cookie': request.headers.get('cookie') || '' },
