@@ -2,6 +2,7 @@
 
 import { useState, FormEvent } from "react"
 import { useRouter } from "next/navigation"
+import { signIn } from "next-auth/react"
 import Link from "next/link"
 
 export default function RegisterPage() {
@@ -43,7 +44,20 @@ export default function RegisterPage() {
                 return
             }
 
-            router.push("/signin")
+            const result = await signIn("credentials", {
+                email,
+                password,
+                redirect: false,
+            })
+
+            if (result?.error) {
+                // Account was created but auto sign-in failed for some reason
+                router.push("/signin")
+                return
+            }
+
+            router.push("/")
+            router.refresh()
         } catch {
             setError("Something went wrong. Please try again.")
         } finally {
