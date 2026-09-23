@@ -236,7 +236,7 @@ const MAX_CONTEXT_TOKENS = 2000;
 
 async function summarizeMessages(messages: Message[]): Promise<string> {
     const response = await anthropic.messages.create({
-        model: "claude-sonnet-4-6",
+        model: "claude-opus-5-5",
         max_tokens: 500,
         system: "Summarize this conversation concisely. Focus on key decisions, preferences, and any meals discussed. Keep it brief.",
         messages: [
@@ -340,7 +340,7 @@ export async function POST(request: Request) {
     })
 
     const response = await anthropic.messages.create({
-        model: "claude-sonnet-4-6",
+        model: "claude-opus-5-5",
         max_tokens: 4096,
         system: getSystemPrompt(),
         messages: [
@@ -439,7 +439,7 @@ export async function POST(request: Request) {
         agentMessages.push({ role: "user", content: toolResults })
 
         currentResponse = await anthropic.messages.create({
-            model: "claude-sonnet-4-6",
+            model: "claude-opus-5-5",
             max_tokens: 4096,
             system: getSystemPrompt(),
             messages: agentMessages,
